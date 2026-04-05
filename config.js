@@ -1,11 +1,11 @@
 // Firebase Configuration
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyA44TLKBn93R8SxgmcVWAjr6wI3SQSTvM0",
+    authDomain: "wasi-smm.firebaseapp.com",
+    projectId: "wasi-smm",
+    storageBucket: "wasi-smm.firebasestorage.app",
+    messagingSenderId: "100481136940",
+    appId: "1:100481136940:web:6dbb01efebc0774957d489"
 };
 
 // Initialize Firebase
