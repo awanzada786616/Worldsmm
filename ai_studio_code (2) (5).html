@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMM ELITE | Admin V3</title>
+    
+    <!-- UI Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #02040a; color: #e2e8f0; }
+        .sidebar { width: 280px; background: #0a0e14; border-right: 1px solid #1e293b; transition: 0.3s; z-index: 50; }
+        .glass-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 24px; transition: 0.3s; }
+        .glass-card:hover { border-color: #3b82f6; box-shadow: 0 0 30px rgba(59, 130, 246, 0.1); }
+        .input-field { background: #020617; border: 1px solid #1e293b; padding: 14px; border-radius: 14px; width: 100%; color: white; outline: none; transition: 0.3s; }
+        .input-field:focus { border-color: #3b82f6; background: #0a0e14; }
+        .nav-btn { display: flex; align-items: center; padding: 16px 20px; border-radius: 14px; color: #64748b; font-weight: 600; width: 100%; margin-bottom: 8px; transition: 0.3s; }
+        .nav-btn:hover, .active-nav { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
+        .btn-grad { background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 14px 28px; border-radius: 12px; font-weight: 800; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-grad:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        
+        /* Modal Style */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 100; }
+    </style>
+</head>
+<body class="flex min-h-screen overflow-x-hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar p-8 sticky top-0 h-screen flex flex-col shrink-0">
+        <div class="mb-12">
+            <img id="adminLogo" src="https://via.placeholder.com/150x40/3b82f6/ffffff?text=LOADING..." class="h-10 object-contain">
+            <p class="text-[10px] tracking-[3px] text-blue-500 font-black uppercase mt-3">Elite System</p>
+        </div>
+
+        <nav class="flex-1">
+            <button onclick="showPage('api')" id="n-api" class="nav-btn active-nav"><i class="fas fa-plug-circle-bolt mr-4"></i> API Sync</button>
+            <button onclick="showPage('services')" id="n-services" class="nav-btn"><i class="fas fa-boxes-stacked mr-4"></i> Services</button>
+            <button onclick="showPage('orders')" id="n-orders" class="nav-btn"><i class="fas fa-cart-shopping mr-4"></i> Orders</button>
+            <button onclick="showPage('users')" id="n-users" class="nav-btn"><i class="fas fa-user-group mr-4"></i> Clients</button>
+            <button onclick="showPage('settings')" id="n-settings" class="nav-btn"><i class="fas fa-paint-brush mr-4"></i> Branding</button>
+        </nav>
+
+        <div class="mt-auto pt-6 border-t border-slate-800">
+            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Admin Version 3.0</p>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 p-12 max-w-7xl mx-auto">
+        
+        <!-- HEADER -->
+        <header class="flex justify-between items-center mb-16">
+            <div>
+                <h1 id="pageTitle" class="text-4xl font-black text-white italic">Provider Sync</h1>
+                <p id="pageDesc" class="text-slate-500 font-medium">Connect and manage external API services.</p>
+            </div>
+            <div class="flex items-center gap-6 glass-card py-3 px-6">
+                <div class="text-right">
+                    <p class="text-xs font-black text-blue-500 uppercase">Super Admin</p>
+                    <p class="text-sm font-bold">Admin Console</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center font-black shadow-lg">A</div>
+            </div>
+        </header>
+
+        <!-- PAGE: API PROVIDER -->
+        <section id="api-page" class="page-sec space-y-10">
+            <div class="glass-card p-10">
+                <h3 class="text-xl font-bold mb-8 text-blue-400">API Configuration</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-500 uppercase ml-1">API Endpoint URL</label>
+                        <input type="text" id="apiUrl" placeholder="https://provider.com/api/v2" class="input-field">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-500 uppercase ml-1">API Key</label>
+                        <input type="password" id="apiKey" placeholder="Paste Provider Key" class="input-field">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-500 uppercase ml-1">Profit Percentage (%)</label>
+                        <input type="number" id="profitPercent" value="15" class="input-field">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="fetchFromAPI()" class="btn-grad w-full flex items-center justify-center">
+                            <i class="fas fa-sync-alt mr-3"></i> Sync All Services
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="apiLoading" class="hidden text-center py-10"><i class="fas fa-circle-notch fa-spin text-5xl text-blue-500"></i></div>
+            <div id="apiResults" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        </section>
+
+        <!-- PAGE: SERVICES LIST -->
+        <section id="services-page" class="page-sec hidden space-y-8">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold italic">Inventory</h2>
+                <button onclick="toggleModal('manualModal', true)" class="bg-emerald-600 px-6 py-3 rounded-xl font-bold text-sm hover:bg-emerald-500"><i class="fas fa-plus mr-2"></i> Add Manual Service</button>
+            </div>
+            <div class="glass-card overflow-hidden">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-900/50 text-[10px] text-slate-500 font-black uppercase">
+                        <tr>
+                            <th class="p-6">Sort</th>
+                            <th class="p-6">Logo</th>
+                            <th class="p-6">Service Name</th>
+                            <th class="p-6">Rate (PKR)</th>
+                            <th class="p-6 text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="serviceTable" class="divide-y divide-slate-800"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- PAGE: ORDERS -->
+        <section id="orders-page" class="page-sec hidden">
+            <h2 class="text-2xl font-bold mb-8 italic">Order Logs</h2>
+            <div class="glass-card overflow-hidden">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-900 text-slate-500 text-[10px] font-black uppercase">
+                        <tr>
+                            <th class="p-6">ID</th>
+                            <th class="p-6">Client</th>
+                            <th class="p-6">Service</th>
+                            <th class="p-6">Status</th>
+                            <th class="p-6 text-center">Update</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderTable" class="divide-y divide-slate-800"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- PAGE: USERS -->
+        <section id="users-page" class="page-sec hidden">
+            <h2 class="text-2xl font-bold mb-8 italic">Registered Clients</h2>
+            <div id="userGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"></div>
+        </section>
+
+        <!-- PAGE: SETTINGS -->
+        <section id="settings-page" class="page-sec hidden">
+            <div class="glass-card p-12 max-w-xl">
+                <h2 class="text-2xl font-bold mb-8 text-blue-500">Logo & Branding</h2>
+                <div class="space-y-6">
+                    <input type="text" id="logoInput" placeholder="Enter Logo Link (PNG/GIF)" class="input-field">
+                    <button onclick="saveLogo()" class="btn-grad w-full">Update Branding</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL: MANUAL SERVICE ADD -->
+    <div id="manualModal" class="modal-overlay">
+        <div class="glass-card p-10 w-full max-w-lg">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-xl font-bold">Add Manual Service</h3>
+                <button onclick="toggleModal('manualModal', false)" class="text-slate-500 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="space-y-4">
+                <input type="text" id="mName" placeholder="Service Name" class="input-field">
+                <input type="text" id="mCategory" placeholder="Category Name" class="input-field">
+                <input type="number" id="mRate" placeholder="Price per 1000 (PKR)" class="input-field">
+                <input type="text" id="mLogo" placeholder="Icon/GIF Link" class="input-field">
+                <button onclick="addManualService()" class="btn-grad w-full mt-4">Save Service</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIC -->
+    <script src="config.js"></script>
+    <script>
+        // Section Navigation
+        function showPage(id) {
+            document.querySelectorAll('.page-sec').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-nav'));
+            document.getElementById(id + '-page').classList.remove('hidden');
+            document.getElementById('n-' + id).classList.add('active-nav');
+            
+            const titles = { 'api': 'Provider Sync', 'services': 'Inventory', 'orders': 'Order Logs', 'users': 'User Base', 'settings': 'Branding' };
+            document.getElementById('pageTitle').innerText = titles[id];
+        }
+
+        function toggleModal(id, show) {
+            document.getElementById(id).style.display = show ? 'flex' : 'none';
+        }
+
+        // --- BRANDING ---
+        async function saveLogo() {
+            const url = document.getElementById('logoInput').value;
+            await db.collection("settings").doc("branding").set({ logo: url });
+            alert("Logo Updated!");
+        }
+
+        db.collection("settings").doc("branding").onSnapshot(doc => {
+            if(doc.exists && doc.data().logo) {
+                document.getElementById('adminLogo').src = doc.data().logo;
+                document.getElementById('logoInput').value = doc.data().logo;
+            }
+        });
+
+        // --- API FETCH & SYNC (WITH ERROR HANDLING) ---
+        async function fetchFromAPI() {
+            const url = document.getElementById('apiUrl').value;
+            const key = document.getElementById('apiKey').value;
+            const margin = document.getElementById('profitPercent').value;
+            const resBox = document.getElementById('apiResults');
+
+            if(!url || !key) return alert("Please enter API URL and Key!");
+
+            document.getElementById('apiLoading').classList.remove('hidden');
+            resBox.innerHTML = "";
+
+            try {
+                // Vercel Proxy call
+                const proxyCall = `/api/proxy?url=${encodeURIComponent(url)}&key=${key}&action=services`;
+                const response = await fetch(proxyCall);
+                const data = await response.json();
+
+                document.getElementById('apiLoading').classList.add('hidden');
+
+                // Check if data is Array (Correct Response)
+                if (!Array.isArray(data)) {
+                    const errorMsg = data.error || data.message || "Invalid API Key or URL. Check Console.";
+                    console.error("API Response Error:", data);
+                    alert("Error: " + errorMsg);
+                    return;
+                }
+
+                const bulkBtn = document.createElement('button');
+                bulkBtn.className = "col-span-full btn-grad bg-indigo-600 mb-6";
+                bulkBtn.innerHTML = `<i class="fas fa-bolt mr-2"></i> Bulk Import ${data.length} Services`;
+                bulkBtn.onclick = () => bulkSync(data, margin);
+                resBox.appendChild(bulkBtn);
+
+                data.forEach(s => {
+                    resBox.innerHTML += `
+                    <div class="glass-card p-6 flex flex-col justify-between">
+                        <h4 class="font-bold text-[13px] text-slate-300 h-10 overflow-hidden leading-tight">${s.name}</h4>
+                        <div class="mt-4 flex justify-between items-center border-t border-slate-800 pt-4">
+                            <span class="text-emerald-500 font-black tracking-tighter">$${s.rate}</span>
+                            <button onclick="addSingle('${s.service}', '${s.name.replace(/'/g,"")}', '${s.category.replace(/'/g,"")}', '${s.rate}', ${margin})" class="text-[10px] bg-slate-800 px-3 py-1 rounded-lg font-black hover:bg-blue-600 transition">ADD</button>
+                        </div>
+                    </div>`;
+                });
+            } catch (err) {
+                alert("Fetch Error: Check Vercel Proxy / API URL");
+                console.error(err);
+                document.getElementById('apiLoading').classList.add('hidden');
+            }
+        }
+
+        async function addSingle(id, name, cat, rate, margin) {
+            const pkrRate = parseFloat(rate) * 285; // PKR Conversion
+            const finalRate = pkrRate + (pkrRate * margin / 100);
+            
+            await db.collection("services").doc(id).set({
+                name, category: cat, rate: finalRate.toFixed(2),
+                providerID: id, sortOrder: 0, catLogo: "https://cdn-icons-png.flaticon.com/512/174/174855.png"
+            });
+        }
+
+        async function bulkSync(data, margin) {
+            if(!confirm(`Start importing ${data.length} services?`)) return;
+            for(let s of data) {
+                await addSingle(s.service, s.name, s.category, s.rate, margin);
+            }
+            alert("Sync Complete!");
+        }
+
+        // --- MANUAL SERVICE ADD ---
+        async function addManualService() {
+            const name = document.getElementById('mName').value;
+            const cat = document.getElementById('mCategory').value;
+            const rate = document.getElementById('mRate').value;
+            const logo = document.getElementById('mLogo').value || "https://cdn-icons-png.flaticon.com/512/174/174855.png";
+
+            if(!name || !rate) return alert("Fill required fields!");
+
+            await db.collection("services").add({
+                name, category: cat, rate: parseFloat(rate).toFixed(2),
+                providerID: "manual", sortOrder: 0, catLogo: logo
+            });
+
+            alert("Service Added Manually!");
+            toggleModal('manualModal', false);
+        }
+
+        // --- SERVICES TABLE ---
+        db.collection("services").orderBy("sortOrder", "asc").onSnapshot(snap => {
+            const tbody = document.getElementById('serviceTable');
+            tbody.innerHTML = "";
+            snap.forEach(doc => {
+                const s = doc.data();
+                tbody.innerHTML += `
+                <tr class="hover:bg-slate-800/30 transition">
+                    <td class="p-6 text-blue-500 font-black">
+                        <div class="flex flex-col gap-1">
+                           <button onclick="sortS('${doc.id}', -1)"><i class="fas fa-caret-up"></i></button>
+                           <button onclick="sortS('${doc.id}', 1)"><i class="fas fa-caret-down"></i></button>
+                        </div>
+                    </td>
+                    <td class="p-6"><img src="${s.catLogo}" class="w-12 h-12 rounded-2xl bg-slate-900 border border-slate-800 p-2 object-contain"></td>
+                    <td class="p-6 font-bold text-sm max-w-xs truncate">${s.name}</td>
+                    <td class="p-6 font-black text-emerald-500">Rs ${s.rate}</td>
+                    <td class="p-6 text-center">
+                        <button onclick="editServiceLogo('${doc.id}')" class="text-slate-400 hover:text-blue-500 mx-3"><i class="fas fa-image"></i></button>
+                        <button onclick="deleteS('${doc.id}')" class="text-red-900 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>`;
+            });
+        });
+
+        async function sortS(id, v) {
+            const ref = db.collection("services").doc(id);
+            const d = await ref.get();
+            await ref.update({ sortOrder: (d.data().sortOrder || 0) + v });
+        }
+
+        async function editServiceLogo(id) {
+            const n = prompt("Enter GIF/Image URL for this category:");
+            if(n) await db.collection("services").doc(id).update({ catLogo: n });
+        }
+
+        async function deleteS(id) {
+            if(confirm("Delete this service?")) await db.collection("services").doc(id).delete();
+        }
+
+        // --- USER MGMT ---
+        db.collection("users").onSnapshot(snap => {
+            const grid = document.getElementById('userGrid');
+            grid.innerHTML = "";
+            snap.forEach(doc => {
+                const u = doc.data();
+                grid.innerHTML += `
+                <div class="glass-card p-8 text-center relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-2 bg-blue-500/10 text-[10px] font-black text-blue-500">CLIENT</div>
+                    <div class="w-16 h-16 bg-blue-600/10 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-500 text-2xl font-black">U</div>
+                    <p class="text-xs font-black truncate">${u.email}</p>
+                    <p class="text-3xl font-black text-emerald-500 mt-6">Rs ${u.balance || 0}</p>
+                    <button onclick="addBalance('${doc.id}')" class="mt-6 w-full py-2 bg-slate-800 rounded-xl text-[10px] font-black hover:bg-blue-600 transition">ADD PKR FUND</button>
+                </div>`;
+            });
+        });
+
+        async function addBalance(uid) {
+            const amt = prompt("Enter Amount to Add (PKR):");
+            if(amt) {
+                const ref = db.collection("users").doc(uid);
+                const d = await ref.get();
+                await ref.update({ balance: parseFloat(d.data().balance || 0) + parseFloat(amt) });
+                alert("Success!");
+            }
+        }
+
+        // --- ORDER MGMT ---
+        db.collection("orders").onSnapshot(snap => {
+            const tbody = document.getElementById('orderTable');
+            tbody.innerHTML = "";
+            snap.forEach(doc => {
+                const o = doc.data();
+                tbody.innerHTML += `
+                <tr class="hover:bg-slate-800/30 transition border-b border-slate-900">
+                    <td class="p-6 font-mono text-[11px] text-blue-400 font-black">#${doc.id.slice(0,8)}</td>
+                    <td class="p-6 text-sm font-bold">${o.userEmail}</td>
+                    <td class="p-6 text-[10px] max-w-xs font-medium text-slate-400">${o.serviceName}</td>
+                    <td class="p-6">
+                        <span class="px-3 py-1 rounded-full bg-slate-800 text-[10px] font-black">${o.status}</span>
+                    </td>
+                    <td class="p-6 text-center">
+                        <select onchange="updateOStatus('${doc.id}', this.value)" class="bg-slate-900 border border-slate-800 p-2 rounded-xl text-[10px] font-black outline-none focus:border-blue-500">
+                            <option value="">Status</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Processing">Processing</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </td>
+                </tr>`;
+            });
+        });
+
+        async function updateOStatus(id, s) {
+            if(s) await db.collection("orders").doc(id).update({ status: s });
+        }
+
+    </script>
+</body>
+</html>
