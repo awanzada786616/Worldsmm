@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMM ELITE | Secure Access</title>
+    
+    <!-- UI Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <!-- Firebase SDKs (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #02040a;
+            background-image: radial-gradient(circle at 50% -20%, #1e3a8a 0%, #02040a 60%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .auth-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
+            width: 100%;
+            max-width: 450px;
+            padding: 48px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            transition: 0.3s;
+        }
+
+        .input-field {
+            width: 100%;
+            background: rgba(2, 6, 23, 0.5);
+            border: 1px solid #1e293b;
+            padding: 16px 16px 16px 52px;
+            border-radius: 16px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: #3b82f6;
+            background: rgba(2, 6, 23, 0.8);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .input-field:focus + i {
+            color: #3b82f6;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            width: 100%;
+            padding: 16px;
+            border-radius: 16px;
+            color: white;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+            box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4);
+        }
+
+        .toggle-link {
+            color: #64748b;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 24px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .toggle-link span {
+            color: #3b82f6;
+            font-weight: 700;
+        }
+
+        /* Loading Spinner */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card" id="authCard">
+        <!-- Logo Section -->
+        <div class="text-center mb-10">
+            <img id="mainLogo" src="https://via.placeholder.com/180x50/3b82f6/ffffff?text=SMM+ELITE" class="h-10 mx-auto mb-4 object-contain">
+            <h2 id="authTitle" class="text-2xl font-black text-white italic">Welcome Back</h2>
+            <p id="authSubtitle" class="text-slate-500 text-sm mt-1 font-medium">Please enter your details to login.</p>
+        </div>
+
+        <!-- Form -->
+        <form id="authForm" onsubmit="handleAuth(event)">
+            <div class="input-group">
+                <input type="email" id="email" class="input-field" placeholder="Email Address" required>
+                <i class="fas fa-envelope"></i>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="password" class="input-field" placeholder="Password" required>
+                <i class="fas fa-lock"></i>
+            </div>
+
+            <div id="signupFields" class="hidden">
+                <div class="input-group">
+                    <input type="password" id="confirmPassword" class="input-field" placeholder="Confirm Password">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn" class="btn-primary flex items-center justify-center gap-3">
+                <span id="btnText">Sign In</span>
+                <div class="loader" id="btnLoader"></div>
+            </button>
+        </form>
+
+        <div class="toggle-link" id="toggleAuth" onclick="toggleView()">
+            Don't have an account? <span>Create Account</span>
+        </div>
+    </div>
+
+    <!-- Firebase Config & Logic -->
+    <script src="config.js"></script>
+    <script>
+        let isLogin = true;
+
+        // Branding Logo Load from Firebase
+        db.collection("settings").doc("branding").onSnapshot(doc => {
+            if(doc.exists && doc.data().logo) {
+                document.getElementById('mainLogo').src = doc.data().logo;
+            }
+        });
+
+        // Toggle between Login & Signup
+        function toggleView() {
+            isLogin = !isLogin;
+            const signupFields = document.getElementById('signupFields');
+            const authTitle = document.getElementById('authTitle');
+            const authSubtitle = document.getElementById('authSubtitle');
+            const btnText = document.getElementById('btnText');
+            const toggleText = document.getElementById('toggleAuth');
+
+            if (isLogin) {
+                gsap.to(signupFields, { height: 0, opacity: 0, display: 'none' });
+                authTitle.innerText = "Welcome Back";
+                authSubtitle.innerText = "Please enter your details to login.";
+                btnText.innerText = "Sign In";
+                toggleText.innerHTML = "Don't have an account? <span>Create Account</span>";
+            } else {
+                signupFields.classList.remove('hidden');
+                gsap.fromTo(signupFields, { height: 0, opacity: 0 }, { height: 'auto', opacity: 1, duration: 0.4 });
+                authTitle.innerText = "Join the Elite";
+                authSubtitle.innerText = "Start your SMM journey today.";
+                btnText.innerText = "Create Account";
+                toggleText.innerHTML = "Already a member? <span>Sign In Instead</span>";
+            }
+        }
+
+        // Handle Login & Signup
+        async function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btnLoader = document.getElementById('btnLoader');
+            const btnText = document.getElementById('btnText');
+
+            // Show Loading
+            btnLoader.style.display = "block";
+            btnText.style.opacity = "0.5";
+
+            try {
+                if (isLogin) {
+                    // LOGIN LOGIC
+                    await auth.signInWithEmailAndPassword(email, password);
+                    
+                    // Check if Admin or User
+                    if(email === "admin@yoursite.com") { // Example Admin Email
+                        window.location.href = "admin.html";
+                    } else {
+                        window.location.href = "dashboard.html";
+                    }
+                } else {
+                    // SIGNUP LOGIC
+                    const confirmPass = document.getElementById('confirmPassword').value;
+                    if(password !== confirmPass) throw new Error("Passwords do not match!");
+
+                    const result = await auth.createUserWithEmailAndPassword(email, password);
+                    const user = result.user;
+
+                    // Create User Profile in Firestore (Sabse Important)
+                    await db.collection("users").doc(user.uid).set({
+                        email: email,
+                        balance: 0,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        role: "user"
+                    });
+
+                    alert("Account Created! Redirecting...");
+                    window.location.href = "dashboard.html";
+                }
+            } catch (error) {
+                alert(error.message);
+            } finally {
+                btnLoader.style.display = "none";
+                btnText.style.opacity = "1";
+            }
+        }
+
+        // Animation on Load
+        gsap.from(".auth-card", { opacity: 0, y: 50, duration: 1, ease: "power4.out" });
+    </script>
+</body>
+</html>
