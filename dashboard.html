@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMM Dashboard | User Portal</title>
+    
+    <!-- UI Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f4f7fe; color: #1a202c; }
+        .purple-grad { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+        .stat-card { background: white; border-radius: 24px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.02); position: relative; overflow: hidden; }
+        .stat-card::after { content: ''; position: absolute; top: -10px; right: -10px; width: 80px; height: 80px; background: #8b5cf610; border-radius: 50%; }
+        
+        /* Drawer Sidebar */
+        #sidebar { transition: transform 0.3s ease-in-out; z-index: 100; }
+        .nav-link { display: flex; align-items: center; padding: 14px 20px; border-radius: 16px; margin-bottom: 8px; color: #64748b; font-weight: 600; transition: 0.3s; }
+        .nav-link.active { background: #8b5cf6; color: white; box-shadow: 0 8px 15px rgba(139, 92, 246, 0.3); }
+        
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px; border-top: 1px solid #e2e8f0; z-index: 50; }
+        .bottom-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; font-weight: 700; color: #94a3b8; }
+        .bottom-item.active { color: #8b5cf6; }
+        .bottom-item i { font-size: 20px; margin-bottom: 4px; }
+
+        input, select { border: 1px solid #e2e8f0; border-radius: 16px; padding: 14px; outline: none; width: 100%; transition: 0.3s; background: #f8fafc; }
+        input:focus, select:focus { border-color: #8b5cf6; background: white; box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1); }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- TOP HEADER -->
+    <header class="bg-white p-4 flex justify-between items-center sticky top-0 z-40 shadow-sm">
+        <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center bg-slate-100 rounded-xl text-slate-600">
+            <i class="fas fa-bars"></i>
+        </button>
+        <img id="dashLogo" src="" class="h-8 object-contain">
+        <div class="w-10"></div> <!-- Spacer -->
+    </header>
+
+    <!-- SIDEBAR DRAWER -->
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 hidden z-[90]"></div>
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-white p-6 -translate-x-full z-[100] shadow-2xl">
+        <div class="stat-card bg-slate-50 mb-8 flex flex-col items-center">
+            <div class="w-16 h-16 purple-grad rounded-2xl flex items-center justify-center text-white text-2xl font-black mb-3" id="userInitial">U</div>
+            <p class="font-black text-slate-800" id="sideUser">@username</p>
+            <div class="flex gap-2 mt-4">
+                <button class="w-10 h-10 bg-white shadow-sm rounded-xl"><i class="fas fa-cog text-slate-400"></i></button>
+                <button class="w-10 h-10 purple-grad text-white rounded-xl shadow-lg"><i class="fas fa-sun"></i></button>
+            </div>
+        </div>
+
+        <nav>
+            <a href="#" class="nav-link active"><i class="fas fa-shopping-cart mr-4"></i> New order</a>
+            <a href="#" class="nav-link"><i class="fas fa-wallet mr-4"></i> Deposit Money</a>
+            <a href="#" class="nav-link"><i class="fas fa-history mr-4"></i> Orders History</a>
+            <a href="#" class="nav-link"><i class="fas fa-ticket mr-4"></i> Tickets</a>
+            <a href="#" class="nav-link"><i class="fas fa-layer-group mr-4"></i> Services</a>
+            <div class="h-[1px] bg-slate-100 my-4"></div>
+            <a href="#" onclick="logout()" class="nav-link text-red-400"><i class="fas fa-sign-out-alt mr-4"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="p-4 md:p-8 max-w-4xl mx-auto space-y-6">
+
+        <!-- NOTICE BOX -->
+        <div class="bg-violet-50 border border-violet-100 p-4 rounded-3xl flex items-start gap-4">
+            <div class="w-10 h-10 purple-grad rounded-xl flex items-center justify-center text-white shrink-0">
+                <i class="fas fa-bullhorn"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-violet-400 uppercase tracking-widest">Notice</p>
+                <p class="text-xs font-bold text-violet-800">Please check start time, refill, and drop details before placing your order.</p>
+            </div>
+        </div>
+
+        <!-- STATS GRID -->
+        <div class="grid grid-cols-2 gap-4">
+            <div class="stat-card">
+                <i class="fas fa-user text-violet-500 mb-3 block"></i>
+                <p class="text-[10px] font-black text-slate-400 uppercase">Username</p>
+                <p class="font-extrabold text-slate-800 truncate" id="statUser">...</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-wallet text-violet-500 mb-3 block"></i>
+                <p class="text-[10px] font-black text-slate-400 uppercase">Current Balance</p>
+                <p class="font-extrabold text-slate-800">PKR <span id="statBalance">0.00</span></p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-chart-line text-violet-500 mb-3 block"></i>
+                <p class="text-[10px] font-black text-slate-400 uppercase">Total Spent</p>
+                <p class="font-extrabold text-slate-800">PKR <span id="statSpent">0.00</span></p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-briefcase text-violet-500 mb-3 block"></i>
+                <p class="text-[10px] font-black text-slate-400 uppercase">Completed Orders</p>
+                <p class="font-extrabold text-slate-800" id="statOrders">0</p>
+            </div>
+        </div>
+
+        <!-- WHATSAPP BANNER -->
+        <a href="https://wa.me/YOUR_NUMBER" class="bg-emerald-500 p-4 rounded-3xl flex items-center justify-center gap-3 text-white font-bold shadow-lg shadow-emerald-500/20">
+            <i class="fab fa-whatsapp text-2xl"></i>
+            Follow our WhatsApp Channel
+        </a>
+
+        <!-- ORDER FORM -->
+        <div class="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100">
+            <div class="flex gap-2 mb-8">
+                <button class="flex-1 py-3 purple-grad text-white rounded-2xl font-bold shadow-lg shadow-violet-500/30">New Order</button>
+                <button class="flex-1 py-3 bg-slate-50 text-slate-400 rounded-2xl font-bold">Rules</button>
+            </div>
+
+            <h3 class="text-xl font-black mb-6">Order Creation</h3>
+
+            <div class="space-y-5">
+                <div>
+                    <label class="text-xs font-black text-slate-400 uppercase ml-2 mb-2 block">Category</label>
+                    <select id="categorySelect" onchange="loadServicesByCategory()"></select>
+                </div>
+
+                <div>
+                    <label class="text-xs font-black text-slate-400 uppercase ml-2 mb-2 block">Service</label>
+                    <select id="serviceSelect" onchange="updatePrice()"></select>
+                </div>
+
+                <div>
+                    <label class="text-xs font-black text-slate-400 uppercase ml-2 mb-2 block">Link</label>
+                    <input type="text" id="orderLink" placeholder="https://instagram.com/p/...">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-black text-slate-400 uppercase ml-2 mb-2 block">Quantity</label>
+                        <input type="number" id="orderQty" oninput="updatePrice()" placeholder="Min: 100">
+                    </div>
+                    <div>
+                        <label class="text-xs font-black text-slate-400 uppercase ml-2 mb-2 block">Price (PKR)</label>
+                        <input type="text" id="totalPrice" disabled class="bg-slate-100 font-bold text-violet-600" value="0.00">
+                    </div>
+                </div>
+
+                <button onclick="placeOrder()" class="w-full py-4 purple-grad text-white rounded-2xl font-black text-lg mt-4 shadow-xl shadow-violet-500/20">
+                    Submit Order
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav">
+        <a href="#" class="bottom-item active"><i class="fas fa-plus-circle"></i>New Order</a>
+        <a href="#" class="bottom-item"><i class="fas fa-wallet"></i>Add Funds</a>
+        <a href="#" class="bottom-item"><i class="fas fa-ticket"></i>Tickets</a>
+        <a href="#" class="bottom-item"><i class="fas fa-list"></i>Services</a>
+        <a href="#" class="bottom-item"><i class="fas fa-cog"></i>Settings</a>
+    </nav>
+
+    <!-- WHATSAPP FLOATING -->
+    <div class="fixed bottom-24 right-4 z-50">
+        <button class="w-14 h-14 bg-violet-500 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl">
+            <i class="fas fa-comment-dots"></i>
+        </button>
+    </div>
+
+    <!-- LOGIC -->
+    <script src="config.js"></script>
+    <script>
+        let userData = null;
+        let allServices = [];
+
+        // 1. Initial Load
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                fetchUserData(user.uid);
+                loadLogo();
+                loadServices();
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        async function fetchUserData(uid) {
+            db.collection("users").doc(uid).onSnapshot(doc => {
+                if(doc.exists) {
+                    userData = doc.data();
+                    document.getElementById('sideUser').innerText = "@" + userData.email.split('@')[0];
+                    document.getElementById('statUser').innerText = userData.email.split('@')[0];
+                    document.getElementById('userInitial').innerText = userData.email.charAt(0).toUpperCase();
+                    document.getElementById('statBalance').innerText = parseFloat(userData.balance || 0).toLocaleString();
+                    document.getElementById('statSpent').innerText = parseFloat(userData.totalSpent || 0).toLocaleString();
+                    
+                    // Fetch completed orders count
+                    db.collection("orders").where("userID", "==", uid).where("status", "==", "Completed").get().then(snap => {
+                        document.getElementById('statOrders').innerText = snap.size;
+                    });
+                }
+            });
+        }
+
+        async function loadLogo() {
+            db.collection("settings").doc("branding").onSnapshot(doc => {
+                if(doc.exists) document.getElementById('dashLogo').src = doc.data().logo;
+            });
+        }
+
+        // 2. Load Services Logic
+        async function loadServices() {
+            const snap = await db.collection("services").orderBy("sortOrder", "asc").get();
+            allServices = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            // Fill Categories
+            const categories = [...new Set(allServices.map(s => s.category))];
+            const catSelect = document.getElementById('categorySelect');
+            catSelect.innerHTML = categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            
+            loadServicesByCategory();
+        }
+
+        function loadServicesByCategory() {
+            const cat = document.getElementById('categorySelect').value;
+            const services = allServices.filter(s => s.category === cat);
+            const servSelect = document.getElementById('serviceSelect');
+            servSelect.innerHTML = services.map(s => `<option value="${s.id}" data-rate="${s.rate}">${s.name} - Rs ${s.rate}</option>`).join('');
+            updatePrice();
+        }
+
+        function updatePrice() {
+            const select = document.getElementById('serviceSelect');
+            const qty = document.getElementById('orderQty').value || 0;
+            if(select.selectedOptions[0]) {
+                const rate = select.selectedOptions[0].getAttribute('data-rate');
+                const total = (parseFloat(rate) / 1000) * qty;
+                document.getElementById('totalPrice').value = total.toFixed(2);
+            }
+        }
+
+        // 3. Place Order
+        async function placeOrder() {
+            const serviceId = document.getElementById('serviceSelect').value;
+            const serviceName = document.getElementById('serviceSelect').selectedOptions[0].text;
+            const qty = parseInt(document.getElementById('orderQty').value);
+            const total = parseFloat(document.getElementById('totalPrice').value);
+            const link = document.getElementById('orderLink').value;
+
+            if(!link || qty < 10) return alert("Please fill details correctly!");
+            if(userData.balance < total) return alert("Insufficient Balance!");
+
+            try {
+                // Add Order
+                await db.collection("orders").add({
+                    userID: auth.currentUser.uid,
+                    userEmail: userData.email,
+                    serviceID: serviceId,
+                    serviceName: serviceName,
+                    link: link,
+                    quantity: qty,
+                    price: total,
+                    status: "Pending",
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Deduct Balance
+                await db.collection("users").doc(auth.currentUser.uid).update({
+                    balance: userData.balance - total,
+                    totalSpent: (userData.totalSpent || 0) + total
+                });
+
+                alert("Order Placed Successfully!");
+            } catch (err) {
+                alert("Error: " + err.message);
+            }
+        }
+
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebarOverlay');
+            sb.classList.toggle('-translate-x-full');
+            ov.classList.toggle('hidden');
+        }
+
+        function logout() {
+            auth.signOut().then(() => window.location.href = "index.html");
+        }
+    </script>
+</body>
+              </html>
