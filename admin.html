@@ -3,146 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMM PRO | Elite Admin</title>
+    <title>SMM ELITE | Super Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #02040a; color: #f1f5f9; overflow-x: hidden; }
+        .sidebar { width: 280px; background: #080a12; border-right: 1px solid #1e293b; z-index: 50; }
+        .glass-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 24px; }
+        .nav-btn { display: flex; align-items: center; padding: 16px 20px; border-radius: 14px; color: #64748b; font-weight: 600; width: 100%; margin-bottom: 8px; transition: 0.3s; }
+        .nav-btn:hover, .active-nav { background: #1d4ed8; color: white; box-shadow: 0 10px 20px rgba(29, 78, 216, 0.2); }
+        .input-field { background: #020617; border: 1px solid #1e293b; padding: 14px; border-radius: 12px; width: 100%; color: white; outline: none; }
+        .btn-primary { background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 14px 28px; border-radius: 12px; font-weight: 800; transition: 0.3s; }
+        .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 100; }
+        .page-content { display: none; }
+        .active-page { display: block; }
+    </style>
 </head>
-<body class="bg-[#02040a] text-slate-200 font-['Plus_Jakarta_Sans'] min-h-screen flex">
+<body class="flex min-h-screen">
 
     <!-- SIDEBAR -->
-    <aside class="w-72 bg-[#080a12] border-r border-slate-900 p-8 sticky top-0 h-screen shrink-0">
-        <div class="mb-12"><img id="adminLogo" src="" class="h-10 object-contain mb-2"><p class="text-[10px] text-blue-500 font-black uppercase tracking-[3px]">Elite Console</p></div>
-        <nav class="space-y-2">
-            <button onclick="showPage('api')" id="n-api" class="w-full flex items-center p-4 rounded-2xl text-slate-500 hover:bg-blue-600 hover:text-white transition active-nav font-bold"><i class="fas fa-sync-alt mr-4"></i> API Sync</button>
-            <button onclick="showPage('services')" id="n-services" class="w-full flex items-center p-4 rounded-2xl text-slate-500 hover:bg-blue-600 hover:text-white transition font-bold"><i class="fas fa-list mr-4"></i> Inventory</button>
-            <button onclick="showPage('users')" id="n-users" class="w-full flex items-center p-4 rounded-2xl text-slate-500 hover:bg-blue-600 hover:text-white transition font-bold"><i class="fas fa-users mr-4"></i> Clients</button>
+    <aside class="sidebar p-8 sticky top-0 h-screen flex flex-col shrink-0">
+        <div class="mb-12">
+            <img id="adminLogo" src="" class="h-10 object-contain">
+            <p class="text-[10px] tracking-[3px] text-blue-500 font-black uppercase mt-3 italic">Admin Panel</p>
+        </div>
+        <nav class="flex-1">
+            <button onclick="navTo('dash')" id="n-dash" class="nav-btn active-nav"><i class="fas fa-gauge-high mr-4"></i> Dashboard</button>
+            <button onclick="navTo('api')" id="n-api" class="nav-btn"><i class="fas fa-network-wired mr-4"></i> API Sync</button>
+            <button onclick="navTo('svcs')" id="n-svcs" class="nav-btn"><i class="fas fa-list mr-4"></i> Services</button>
+            <button onclick="navTo('orders')" id="n-orders" class="nav-btn"><i class="fas fa-cart-shopping mr-4"></i> Orders</button>
+            <button onclick="navTo('users')" id="n-users" class="nav-btn"><i class="fas fa-users-gear mr-4"></i> Users</button>
+            <button onclick="navTo('brand')" id="n-brand" class="nav-btn"><i class="fas fa-palette mr-4"></i> Branding</button>
         </nav>
     </aside>
 
     <!-- MAIN -->
     <main class="flex-1 p-12 max-w-7xl mx-auto w-full">
-        <header class="flex justify-between items-center mb-16">
-            <h1 id="pageTitle" class="text-4xl font-black italic">API Sync</h1>
-            <div class="bg-blue-600/10 border border-blue-500/20 px-6 py-2 rounded-2xl text-blue-500 font-black text-xs tracking-widest">SUPER ADMIN</div>
+        
+        <!-- HEADER -->
+        <header class="flex justify-between items-center mb-12">
+            <h1 id="pageTitle" class="text-4xl font-black italic">Dashboard</h1>
+            <div class="glass-card py-3 px-6 flex items-center gap-4">
+                <span class="text-xs font-black text-blue-500">SUPER ADMIN</span>
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-bold">A</div>
+            </div>
         </header>
 
-        <!-- PAGE: API SYNC -->
-        <section id="api-page" class="page-sec space-y-8">
-            <div class="bg-[#0f172a] p-10 rounded-[40px] border border-slate-800 shadow-2xl">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-500 uppercase ml-2">Provider API URL</label>
-                        <input type="text" id="apiUrl" placeholder="https://shadowsmmpanel.com/api/v2" class="w-full bg-[#020617] border border-slate-800 p-4 rounded-2xl outline-none focus:border-blue-600">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-500 uppercase ml-2">Your API Key</label>
-                        <input type="password" id="apiKey" placeholder="Paste Secret Key" class="w-full bg-[#020617] border border-slate-800 p-4 rounded-2xl outline-none focus:border-blue-600">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-500 uppercase ml-2">Profit Percentage (%)</label>
-                        <input type="number" id="profit" value="15" class="w-full bg-[#020617] border border-slate-800 p-4 rounded-2xl outline-none focus:border-blue-600">
-                    </div>
-                    <div class="flex items-end">
-                        <button onclick="fetchServices()" class="w-full bg-blue-600 p-4 rounded-2xl font-black uppercase hover:scale-[1.02] transition shadow-xl shadow-blue-600/20">Fetch Services Now</button>
-                    </div>
+        <!-- DASHBOARD PAGE -->
+        <section id="page-dash" class="page-content active-page">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="glass-card p-8">
+                    <p class="text-xs text-slate-500 font-bold uppercase mb-2">Total Users</p>
+                    <h2 class="text-3xl font-black" id="stat-users">0</h2>
+                </div>
+                <div class="glass-card p-8">
+                    <p class="text-xs text-slate-500 font-bold uppercase mb-2">Total Orders</p>
+                    <h2 class="text-3xl font-black" id="stat-orders">0</h2>
+                </div>
+                <div class="glass-card p-8 text-emerald-500">
+                    <p class="text-xs text-slate-500 font-bold uppercase mb-2">Revenue</p>
+                    <h2 class="text-3xl font-black" id="stat-rev">Rs 0</h2>
                 </div>
             </div>
-
-            <div id="loader" class="hidden text-center py-10"><i class="fas fa-atom fa-spin text-5xl text-blue-500"></i><p class="mt-4 font-bold text-blue-500">Bypassing Cloudflare...</p></div>
-            <div id="apiResults" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
-        <!-- PAGE: SERVICES -->
-        <section id="services-page" class="page-sec hidden space-y-8">
-            <h2 class="text-2xl font-bold italic">Dashboard Inventory</h2>
-            <div class="bg-[#0f172a] rounded-[32px] overflow-hidden border border-slate-800">
-                <table class="w-full text-left"><thead class="bg-slate-900/50 text-[10px] font-black text-slate-500 uppercase"><tr><th class="p-6">Icon</th><th class="p-6">Name</th><th class="p-6">Rate</th><th class="p-6">Action</th></tr></thead><tbody id="serviceTable" class="divide-y divide-slate-800"></tbody></table>
+        <!-- API SYNC PAGE -->
+        <section id="page-api" class="page-content space-y-8">
+            <div class="glass-card p-10">
+                <h3 class="text-xl font-bold mb-8 text-blue-500"><i class="fas fa-sync mr-3"></i> Sync Provider Services</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <input type="text" id="apiUrl" placeholder="https://shadowsmmpanel.com/api/v2" class="input-field">
+                    <input type="password" id="apiKey" placeholder="Your API Key" class="input-field">
+                    <input type="number" id="profit" value="15" placeholder="Profit %" class="input-field">
+                    <button onclick="fetchServices()" class="btn-primary">Fetch via Cloudflare Bypass</button>
+                </div>
+            </div>
+            <div id="apiResults" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- SERVICES PAGE -->
+        <section id="page-svcs" class="page-content space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold">Manage Inventory</h2>
+                <button onclick="toggleModal('mModal', true)" class="bg-emerald-600 px-6 py-3 rounded-xl font-bold text-sm">Add Manual</button>
+            </div>
+            <div class="glass-card overflow-hidden">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-900/50 text-[10px] font-black uppercase text-slate-500">
+                        <tr><th class="p-6">Icon</th><th class="p-6">Name</th><th class="p-6">Rate (PKR)</th><th class="p-6 text-center">Action</th></tr>
+                    </thead>
+                    <tbody id="serviceTable" class="divide-y divide-slate-800"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- USERS PAGE -->
+        <section id="page-users" class="page-content">
+            <div id="userGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- ORDERS PAGE -->
+        <section id="page-orders" class="page-content">
+            <div class="glass-card overflow-hidden">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-900 text-[10px] uppercase font-black">
+                        <tr><th class="p-6">ID</th><th class="p-6">User</th><th class="p-6">Service</th><th class="p-6">Status</th><th class="p-6">Update</th></tr>
+                    </thead>
+                    <tbody id="orderTable" class="divide-y divide-slate-800"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- BRANDING PAGE -->
+        <section id="page-brand" class="page-content">
+            <div class="glass-card p-10 max-w-xl">
+                <h2 class="text-2xl font-bold mb-6">Panel Logo</h2>
+                <input type="text" id="logoUrl" placeholder="Enter Image URL" class="input-field mb-6">
+                <button onclick="saveLogo()" class="btn-primary w-full">Save Branding</button>
             </div>
         </section>
 
     </main>
 
+    <!-- MANUAL MODAL -->
+    <div id="mModal" class="modal">
+        <div class="glass-card p-10 w-full max-w-lg">
+            <h3 class="text-xl font-bold mb-6">Manual Service</h3>
+            <div class="space-y-4">
+                <input type="text" id="mName" placeholder="Service Name" class="input-field">
+                <input type="text" id="mCat" placeholder="Category" class="input-field">
+                <input type="number" id="mPrice" placeholder="Price (PKR)" class="input-field">
+                <input type="text" id="mLogo" placeholder="Icon URL" class="input-field">
+                <button onclick="addManual()" class="btn-primary w-full">Save Service</button>
+                <button onclick="toggleModal('mModal', false)" class="w-full text-slate-500 font-bold">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script src="config.js"></script>
     <script>
-        function showPage(id) {
-            document.querySelectorAll('.page-sec').forEach(s => s.classList.add('hidden'));
-            document.getElementById(id + '-page').classList.remove('hidden');
-            document.getElementById('pageTitle').innerText = id.toUpperCase();
+        // NAVIGATION
+        function navTo(page) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active-page'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-nav'));
+            document.getElementById('page-' + page).classList.add('active-page');
+            document.getElementById('n-' + page).classList.add('active-nav');
+            document.getElementById('pageTitle').innerText = page.toUpperCase();
         }
 
-        // --- THE ULTIMATE FETCH TRICK ---
+        function toggleModal(id, show) { document.getElementById(id).style.display = show ? 'flex' : 'none'; }
+
+        // --- THE API FETCH TRICK (BYPASS CLOUDFLARE) ---
         async function fetchServices() {
             const url = document.getElementById('apiUrl').value;
             const key = document.getElementById('apiKey').value;
             const profit = document.getElementById('profit').value;
-            if(!url || !key) return alert("Please enter URL and Key!");
-
-            document.getElementById('loader').classList.remove('hidden');
-            document.getElementById('apiResults').innerHTML = "";
+            const resBox = document.getElementById('apiResults');
+            
+            if(!url || !key) return alert("URL and Key missing!");
+            resBox.innerHTML = "<p class='col-span-full text-blue-500 font-bold'>Connecting to Provider via Proxy...</p>";
 
             try {
-                // Method: AllOrigins RAW (Best for Cloudflare bypass)
+                // BYPASS LOGIC using allorigins
                 const target = `${url}?action=services&key=${key}`;
                 const bypassUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`;
+                
+                const response = await fetch(bypassUrl);
+                const data = await response.json();
 
-                const res = await fetch(bypassUrl);
-                const data = await res.json();
+                if(!Array.isArray(data)) throw new Error("Invalid Response. Check API Key.");
 
-                document.getElementById('loader').classList.add('hidden');
-
-                if(!Array.isArray(data)) {
-                    alert("Provider returned an error: " + (data.error || "Check your API key."));
-                    return;
-                }
-
-                // Show Results with Sync All Button
-                const resBox = document.getElementById('apiResults');
-                resBox.innerHTML = `<button onclick='syncAll(${JSON.stringify(data)}, ${profit})' class="col-span-full bg-emerald-600 p-5 rounded-2xl font-black mb-6">CLICK TO SYNC ALL ${data.length} SERVICES</button>`;
-
-                data.slice(0, 21).forEach(s => {
-                    resBox.innerHTML += `<div class="bg-[#0f172a] p-6 rounded-3xl border border-slate-800 hover:border-blue-600 transition">
-                        <h4 class="font-bold text-xs h-10 overflow-hidden leading-tight">${s.name}</h4>
-                        <div class="mt-4 flex justify-between items-center pt-4 border-t border-slate-800">
+                resBox.innerHTML = `<button onclick='syncAll(${JSON.stringify(data)}, ${profit})' class="col-span-full bg-indigo-600 p-5 rounded-2xl font-black mb-6 uppercase">Sync All ${data.length} Services to PKR</button>`;
+                
+                data.slice(0, 15).forEach(s => {
+                    resBox.innerHTML += `<div class="glass-card p-6">
+                        <h4 class="font-bold text-xs h-10 overflow-hidden text-slate-300">${s.name}</h4>
+                        <p class="text-[10px] text-blue-500 mt-2 font-bold">${s.category}</p>
+                        <div class="mt-4 flex justify-between items-center border-t border-slate-800 pt-4">
                             <span class="text-emerald-500 font-black">$${s.rate}</span>
-                            <span class="text-[10px] text-slate-500 font-bold">${s.category.slice(0,15)}...</span>
+                            <span class="text-slate-500 text-[10px]">ID: ${s.service}</span>
                         </div>
                     </div>`;
                 });
-            } catch (e) {
-                alert("Cloudflare is very strong. Ensure your URL is https://shadowsmmpanel.com/api/v2");
-                document.getElementById('loader').classList.add('hidden');
+            } catch (err) {
+                alert("Bypass Failed: Check URL or use Manual Paste method.");
             }
         }
 
         async function syncAll(data, margin) {
-            alert("Syncing " + data.length + " services to PKR. Please wait...");
+            alert("Starting Sync... This might take a minute.");
             for(let s of data) {
-                const pkrRate = parseFloat(s.rate) * 285;
-                const finalRate = pkrRate + (pkrRate * margin / 100);
-                await db.collection("services").doc(s.service.toString()).set({
-                    name: s.name, category: s.category, rate: finalRate.toFixed(2), providerID: s.service, sortOrder: 0, catLogo: "https://cdn-icons-png.flaticon.com/512/174/174855.png"
+                const pkrRate = parseFloat(s.rate) * 285; // PKR Conversion
+                const finalPrice = pkrRate + (pkrRate * margin / 100);
+                await db.ref('services/' + s.service).set({
+                    name: s.name, category: s.category, rate: finalPrice.toFixed(2), providerID: s.service, sortOrder: 0, catLogo: "https://cdn-icons-png.flaticon.com/512/174/174855.png"
                 });
             }
-            alert("All Services Synced Successfully!");
+            alert("Services Synced with Profit!");
         }
 
-        // Service Table Loader
-        db.collection("services").onSnapshot(snap => {
-            const tb = document.getElementById('serviceTable');
-            if(!tb) return; tb.innerHTML = "";
-            snap.forEach(doc => {
-                const s = doc.data();
-                tb.innerHTML += `<tr class="border-b border-slate-900"><td class="p-6"><img src="${s.catLogo}" class="w-8 h-8 rounded-lg bg-slate-800 p-1"></td><td class="p-6 text-xs font-bold text-slate-300">${s.name}</td><td class="p-6 font-black text-emerald-500">Rs ${s.rate}</td><td class="p-6 text-center"><button onclick="db.collection('services').doc('${doc.id}').delete()" class="text-red-900"><i class="fas fa-trash"></i></button></td></tr>`;
+        // --- REALTIME LISTENERS (NULL-SAFE) ---
+        function listen() {
+            // Dashboard Stats
+            db.ref('users').on('value', snap => {
+                if(document.getElementById('stat-users')) document.getElementById('stat-users').innerText = snap.numChildren();
+                const grid = document.getElementById('userGrid');
+                if(grid) {
+                    grid.innerHTML = "";
+                    snap.forEach(userSnap => {
+                        const u = userSnap.val();
+                        grid.innerHTML += `<div class="glass-card p-8 text-center">
+                            <div class="w-16 h-16 bg-blue-600/10 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-500 text-2xl font-bold">U</div>
+                            <p class="text-xs font-bold truncate">${u.email}</p>
+                            <p class="text-3xl font-black text-emerald-500 mt-4">Rs ${u.balance || 0}</p>
+                            <button onclick="addFund('${userSnap.key}')" class="mt-6 w-full py-2 bg-slate-800 rounded-xl text-[10px] font-black">ADD FUND</button>
+                        </div>`;
+                    });
+                }
             });
-        });
 
-        db.collection("settings").doc("branding").onSnapshot(doc => { if(doc.exists) document.getElementById('adminLogo').src = doc.data().logo; });
+            db.ref('orders').on('value', snap => {
+                if(document.getElementById('stat-orders')) document.getElementById('stat-orders').innerText = snap.numChildren();
+                const table = document.getElementById('orderTable');
+                if(table) {
+                    table.innerHTML = "";
+                    snap.forEach(orderSnap => {
+                        const o = orderSnap.val();
+                        table.innerHTML += `<tr class="border-b border-slate-900 text-xs hover:bg-slate-800/20">
+                            <td class="p-6 text-blue-400 font-bold">#${orderSnap.key.slice(0,6)}</td>
+                            <td class="p-6">${o.userEmail}</td>
+                            <td class="p-6 font-medium">${o.serviceName}</td>
+                            <td class="p-6 font-black">${o.status}</td>
+                            <td class="p-6"><select onchange="updateO('${orderSnap.key}', this.value)" class="bg-slate-900 p-1 rounded"><option value="">Edit</option><option value="Processing">Processing</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option></select></td>
+                        </tr>`;
+                    });
+                }
+            });
+
+            db.ref('services').on('value', snap => {
+                const table = document.getElementById('serviceTable');
+                if(table) {
+                    table.innerHTML = "";
+                    snap.forEach(svcSnap => {
+                        const s = svcSnap.val();
+                        table.innerHTML += `<tr class="border-b border-slate-900 hover:bg-slate-800/10">
+                            <td class="p-6"><img src="${s.catLogo}" class="w-8 h-8 rounded-lg bg-slate-800 p-1"></td>
+                            <td class="p-6 text-xs font-bold">${s.name}</td>
+                            <td class="p-6 font-black text-emerald-500">Rs ${s.rate}</td>
+                            <td class="p-6 text-center"><button onclick="db.ref('services/${svcSnap.key}').remove()" class="text-red-500"><i class="fas fa-trash"></i></button></td>
+                        </tr>`;
+                    });
+                }
+            });
+
+            db.ref('settings/branding').on('value', snap => {
+                if(snap.exists()) {
+                    document.getElementById('adminLogo').src = snap.val().logo;
+                    document.getElementById('logoUrl').value = snap.val().logo;
+                }
+            });
+        }
+
+        // --- ACTIONS ---
+        async function saveLogo() {
+            const url = document.getElementById('logoUrl').value;
+            await db.ref('settings/branding').set({ logo: url });
+            alert("Logo Updated!");
+        }
+
+        async function addManual() {
+            const n = document.getElementById('mName').value;
+            const c = document.getElementById('mCat').value;
+            const p = document.getElementById('mPrice').value;
+            const l = document.getElementById('mLogo').value || "https://cdn-icons-png.flaticon.com/512/174/174855.png";
+            await db.ref('services').push({ name: n, category: c, rate: parseFloat(p).toFixed(2), providerID: "manual", sortOrder: 0, catLogo: l });
+            alert("Service Added!"); toggleModal('mModal', false);
+        }
+
+        async function addFund(uid) {
+            const amt = prompt("Amount (PKR):");
+            if(amt) {
+                const ref = db.ref('users/' + uid + '/balance');
+                const snap = await ref.once('value');
+                await ref.set(parseFloat(snap.val() || 0) + parseFloat(amt));
+            }
+        }
+
+        async function updateO(id, s) { if(s) await db.ref('orders/' + id).update({ status: s }); }
+
+        listen();
     </script>
 </body>
-</html>
+    </html>
