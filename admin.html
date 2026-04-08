@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMM ELITE | Pro Sync Console</title>
+    <title>SMM PRO | Elite Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,74 +11,58 @@
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
 </head>
 <body class="bg-[#02040a] text-slate-200 font-['Plus_Jakarta_Sans'] min-h-screen flex">
 
     <!-- SIDEBAR -->
     <aside class="w-72 bg-[#080a12] border-r border-slate-900 p-8 sticky top-0 h-screen shrink-0">
-        <div class="mb-12">
-            <img id="adminLogo" src="" class="h-10 object-contain mb-2">
-            <p class="text-[10px] tracking-[4px] text-blue-500 font-black uppercase">Admin Elite</p>
-        </div>
-        <nav class="space-y-3">
+        <div class="mb-12"><img id="adminLogo" src="" class="h-10 object-contain mb-2"><p class="text-[10px] text-blue-500 font-black uppercase tracking-[3px]">Elite Console</p></div>
+        <nav class="space-y-2">
             <button onclick="showPage('api')" id="n-api" class="w-full flex items-center p-4 rounded-2xl text-slate-500 hover:bg-blue-600 hover:text-white transition active-nav font-bold"><i class="fas fa-sync-alt mr-4"></i> API Sync</button>
-            <button onclick="showPage('services')" id="n-services" class="w-full flex items-center p-4 rounded-2xl text-slate-500 hover:bg-blue-600 hover:text-white transition font-bold"><i class="fas fa-th-list mr-4"></i> Inventory</button>
-            <button onclick="showPage('users')" id="n-users" class="w-full flex items-center p-4 rounded-2xl text-slate-500 hover:bg-blue-600 hover:text-white transition font-bold"><i class="fas fa-users mr-4"></i> Users</button>
+            <button onclick="showPage('services')" id="n-services" class="w-full flex items-center p-4 rounded-2xl text-slate-500 hover:bg-blue-600 hover:text-white transition font-bold"><i class="fas fa-list mr-4"></i> Inventory</button>
+            <button onclick="showPage('users')" id="n-users" class="w-full flex items-center p-4 rounded-2xl text-slate-500 hover:bg-blue-600 hover:text-white transition font-bold"><i class="fas fa-users mr-4"></i> Clients</button>
         </nav>
     </aside>
 
     <!-- MAIN -->
     <main class="flex-1 p-12 max-w-7xl mx-auto w-full">
         <header class="flex justify-between items-center mb-16">
-            <h1 id="pageTitle" class="text-4xl font-black italic uppercase italic">Sync Master</h1>
-            <div class="bg-blue-600/10 border border-blue-500/20 px-6 py-2 rounded-2xl text-blue-500 font-black text-xs">SUPER ADMIN</div>
+            <h1 id="pageTitle" class="text-4xl font-black italic">API Sync</h1>
+            <div class="bg-blue-600/10 border border-blue-500/20 px-6 py-2 rounded-2xl text-blue-500 font-black text-xs tracking-widest">SUPER ADMIN</div>
         </header>
 
-        <!-- API SYNC PAGE -->
+        <!-- PAGE: API SYNC -->
         <section id="api-page" class="page-sec space-y-8">
             <div class="bg-[#0f172a] p-10 rounded-[40px] border border-slate-800 shadow-2xl">
-                <div class="flex justify-between items-center mb-10">
-                    <h3 class="text-xl font-bold text-blue-400 italic">Bypass & Sync Services</h3>
-                    <div class="flex items-center gap-4">
-                        <span class="text-xs text-slate-500">PKR Profit %</span>
-                        <input type="number" id="profit" value="15" class="w-20 bg-[#020617] border border-slate-800 p-2 rounded-xl text-center font-bold text-blue-400">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-500 uppercase ml-2">Provider API URL</label>
+                        <input type="text" id="apiUrl" placeholder="https://shadowsmmpanel.com/api/v2" class="w-full bg-[#020617] border border-slate-800 p-4 rounded-2xl outline-none focus:border-blue-600">
                     </div>
-                </div>
-
-                <div class="grid grid-cols-1 gap-10">
-                    <div class="bg-blue-600/5 p-8 rounded-[32px] border border-blue-500/10">
-                        <p class="text-sm font-bold text-blue-400 mb-6 uppercase tracking-widest"><i class="fas fa-terminal mr-2"></i> How to Get JSON Data (No Error Method)</p>
-                        <ol class="text-xs text-slate-400 space-y-4 list-decimal ml-5 mb-8">
-                            <li>ShadowSMM ki website par Login karein.</li>
-                            <li>Naye tab mein yeh link kholain: <br> <code class="text-blue-500">https://shadowsmmpanel.com/api/v2?action=services&key=YOUR_KEY</code></li>
-                            <li>Agar wahan "Sample return" wala page (jo aapne dikhaya) aaye, toh niche scroll karein, wahan <b>Sample Return</b> ke box mein jo data <code class="text-emerald-500">[ ... ]</code> se shuru ho raha hai, usay copy kar lain.</li>
-                            <li>Wo sara data niche waale box mein paste kar dain.</li>
-                        </ol>
-
-                        <textarea id="jsonInput" rows="8" placeholder='Paste ShadowSMM JSON here [ { "service": "1", ... } ]' class="w-full bg-[#020617] border border-slate-800 p-6 rounded-[24px] text-[10px] font-mono outline-none focus:border-blue-600 mb-6"></textarea>
-                        
-                        <button onclick="startManualSync()" class="w-full bg-blue-600 p-5 rounded-2xl font-black uppercase shadow-xl hover:scale-[1.01] transition shadow-blue-600/20">
-                            Sync Services to Database (PKR)
-                        </button>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-500 uppercase ml-2">Your API Key</label>
+                        <input type="password" id="apiKey" placeholder="Paste Secret Key" class="w-full bg-[#020617] border border-slate-800 p-4 rounded-2xl outline-none focus:border-blue-600">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-500 uppercase ml-2">Profit Percentage (%)</label>
+                        <input type="number" id="profit" value="15" class="w-full bg-[#020617] border border-slate-800 p-4 rounded-2xl outline-none focus:border-blue-600">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="fetchServices()" class="w-full bg-blue-600 p-4 rounded-2xl font-black uppercase hover:scale-[1.02] transition shadow-xl shadow-blue-600/20">Fetch Services Now</button>
                     </div>
                 </div>
             </div>
 
-            <div id="syncStatus" class="hidden p-6 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 font-bold text-center rounded-2xl animate-pulse">
-                <i class="fas fa-spinner fa-spin mr-3"></i> Syncing... Do not close window.
-            </div>
+            <div id="loader" class="hidden text-center py-10"><i class="fas fa-atom fa-spin text-5xl text-blue-500"></i><p class="mt-4 font-bold text-blue-500">Bypassing Cloudflare...</p></div>
+            <div id="apiResults" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
-        <!-- SERVICES PAGE -->
-        <section id="services-page" class="page-sec hidden space-y-6">
-            <h2 class="text-2xl font-black italic">Inventory</h2>
+        <!-- PAGE: SERVICES -->
+        <section id="services-page" class="page-sec hidden space-y-8">
+            <h2 class="text-2xl font-bold italic">Dashboard Inventory</h2>
             <div class="bg-[#0f172a] rounded-[32px] overflow-hidden border border-slate-800">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-900/50 text-[10px] font-black uppercase text-slate-500">
-                        <tr><th class="p-6">Icon</th><th class="p-6">Service</th><th class="p-6">PKR Rate</th><th class="p-6 text-center">Delete</th></tr>
-                    </thead>
-                    <tbody id="serviceTable" class="divide-y divide-slate-800"></tbody>
-                </table>
+                <table class="w-full text-left"><thead class="bg-slate-900/50 text-[10px] font-black text-slate-500 uppercase"><tr><th class="p-6">Icon</th><th class="p-6">Name</th><th class="p-6">Rate</th><th class="p-6">Action</th></tr></thead><tbody id="serviceTable" class="divide-y divide-slate-800"></tbody></table>
             </div>
         </section>
 
@@ -86,81 +70,79 @@
 
     <script src="config.js"></script>
     <script>
-        // NAVIGATION
         function showPage(id) {
             document.querySelectorAll('.page-sec').forEach(s => s.classList.add('hidden'));
             document.getElementById(id + '-page').classList.remove('hidden');
             document.getElementById('pageTitle').innerText = id.toUpperCase();
         }
 
-        // SYNC LOGIC
-        async function startManualSync() {
-            const jsonText = document.getElementById('jsonInput').value.trim();
-            const margin = parseFloat(document.getElementById('profit').value);
+        // --- THE ULTIMATE FETCH TRICK ---
+        async function fetchServices() {
+            const url = document.getElementById('apiUrl').value;
+            const key = document.getElementById('apiKey').value;
+            const profit = document.getElementById('profit').value;
+            if(!url || !key) return alert("Please enter URL and Key!");
+
+            document.getElementById('loader').classList.remove('hidden');
+            document.getElementById('apiResults').innerHTML = "";
 
             try {
-                const data = JSON.parse(jsonText);
-                if(!Array.isArray(data)) throw new Error("Please paste the list starting with [ and ending with ]");
+                // Method: AllOrigins RAW (Best for Cloudflare bypass)
+                const target = `${url}?action=services&key=${key}`;
+                const bypassUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`;
 
-                document.getElementById('syncStatus').classList.remove('hidden');
+                const res = await fetch(bypassUrl);
+                const data = await res.json();
 
-                for(let s of data) {
-                    await saveToFirebase(s, margin);
+                document.getElementById('loader').classList.add('hidden');
+
+                if(!Array.isArray(data)) {
+                    alert("Provider returned an error: " + (data.error || "Check your API key."));
+                    return;
                 }
 
-                document.getElementById('syncStatus').classList.add('hidden');
-                document.getElementById('jsonInput').value = "";
-                alert("Success! " + data.length + " Services Synced to PKR.");
+                // Show Results with Sync All Button
+                const resBox = document.getElementById('apiResults');
+                resBox.innerHTML = `<button onclick='syncAll(${JSON.stringify(data)}, ${profit})' class="col-span-full bg-emerald-600 p-5 rounded-2xl font-black mb-6">CLICK TO SYNC ALL ${data.length} SERVICES</button>`;
+
+                data.slice(0, 21).forEach(s => {
+                    resBox.innerHTML += `<div class="bg-[#0f172a] p-6 rounded-3xl border border-slate-800 hover:border-blue-600 transition">
+                        <h4 class="font-bold text-xs h-10 overflow-hidden leading-tight">${s.name}</h4>
+                        <div class="mt-4 flex justify-between items-center pt-4 border-t border-slate-800">
+                            <span class="text-emerald-500 font-black">$${s.rate}</span>
+                            <span class="text-[10px] text-slate-500 font-bold">${s.category.slice(0,15)}...</span>
+                        </div>
+                    </div>`;
+                });
             } catch (e) {
-                alert("Error: " + e.message + "\n\nTip: Scroll down to 'Sample Return' on the provider page and copy the data inside the code box.");
+                alert("Cloudflare is very strong. Ensure your URL is https://shadowsmmpanel.com/api/v2");
+                document.getElementById('loader').classList.add('hidden');
             }
         }
 
-        async function saveToFirebase(s, margin) {
-            // PKR Calculation (1 USD = 285 PKR + Profit)
-            const pkrRate = (parseFloat(s.rate) * 285);
-            const finalRate = pkrRate + (pkrRate * margin / 100);
-
-            // Auto Logo Detection
-            let logo = "https://cdn-icons-png.flaticon.com/512/174/174855.png"; 
-            const n = s.name.toLowerCase();
-            const c = s.category.toLowerCase();
-            
-            if(n.includes('instagram') || c.includes('instagram')) logo = "https://cdn-icons-png.flaticon.com/512/174/174855.png";
-            else if(n.includes('facebook') || c.includes('facebook')) logo = "https://cdn-icons-png.flaticon.com/512/174/174848.png";
-            else if(n.includes('youtube') || c.includes('youtube')) logo = "https://cdn-icons-png.flaticon.com/512/174/174883.png";
-            else if(n.includes('tiktok') || c.includes('tiktok')) logo = "https://cdn-icons-png.flaticon.com/512/3046/3046121.png";
-
-            await db.collection("services").doc(s.service.toString()).set({
-                name: s.name,
-                category: s.category,
-                rate: finalRate.toFixed(2),
-                providerID: s.service,
-                catLogo: logo,
-                sortOrder: 0
-            });
+        async function syncAll(data, margin) {
+            alert("Syncing " + data.length + " services to PKR. Please wait...");
+            for(let s of data) {
+                const pkrRate = parseFloat(s.rate) * 285;
+                const finalRate = pkrRate + (pkrRate * margin / 100);
+                await db.collection("services").doc(s.service.toString()).set({
+                    name: s.name, category: s.category, rate: finalRate.toFixed(2), providerID: s.service, sortOrder: 0, catLogo: "https://cdn-icons-png.flaticon.com/512/174/174855.png"
+                });
+            }
+            alert("All Services Synced Successfully!");
         }
 
-        // LOAD SERVICES
+        // Service Table Loader
         db.collection("services").onSnapshot(snap => {
             const tb = document.getElementById('serviceTable');
-            if(!tb) return;
-            tb.innerHTML = "";
+            if(!tb) return; tb.innerHTML = "";
             snap.forEach(doc => {
                 const s = doc.data();
-                tb.innerHTML += `<tr class="border-b border-slate-900">
-                    <td class="p-6"><img src="${s.catLogo}" class="w-8 h-8 rounded-lg"></td>
-                    <td class="p-6 text-xs font-bold text-slate-300">${s.name}</td>
-                    <td class="p-6 font-black text-emerald-500">Rs ${s.rate}</td>
-                    <td class="p-6 text-center"><button onclick="db.collection('services').doc('${doc.id}').delete()" class="text-red-900"><i class="fas fa-trash"></i></button></td>
-                </tr>`;
+                tb.innerHTML += `<tr class="border-b border-slate-900"><td class="p-6"><img src="${s.catLogo}" class="w-8 h-8 rounded-lg bg-slate-800 p-1"></td><td class="p-6 text-xs font-bold text-slate-300">${s.name}</td><td class="p-6 font-black text-emerald-500">Rs ${s.rate}</td><td class="p-6 text-center"><button onclick="db.collection('services').doc('${doc.id}').delete()" class="text-red-900"><i class="fas fa-trash"></i></button></td></tr>`;
             });
         });
 
-        // Branding
-        db.collection("settings").doc("branding").onSnapshot(doc => {
-            if(doc.exists) document.getElementById('adminLogo').src = doc.data().logo;
-        });
+        db.collection("settings").doc("branding").onSnapshot(doc => { if(doc.exists) document.getElementById('adminLogo').src = doc.data().logo; });
     </script>
 </body>
 </html>
