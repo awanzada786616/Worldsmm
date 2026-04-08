@@ -3,278 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMM ELITE | Ultimate Admin Console</title>
-    
+    <title>SMM ELITE | Pro Sync Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Firebase SDKs -->
+    
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
-
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020408; color: #f1f5f9; }
-        .sidebar { width: 280px; background: #080a0f; border-right: 1px solid #1e293b; transition: 0.3s; }
-        .glass-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 24px; transition: 0.3s; }
-        .input-field { background: #020617; border: 1px solid #1e293b; padding: 14px; border-radius: 14px; width: 100%; color: white; outline: none; }
-        .input-field:focus { border-color: #3b82f6; }
-        .nav-btn { display: flex; align-items: center; padding: 16px 20px; border-radius: 14px; color: #64748b; font-weight: 600; width: 100%; margin-bottom: 8px; transition: 0.3s; }
-        .active-nav { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
-        .btn-grad { background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 14px 28px; border-radius: 12px; font-weight: 800; transition: 0.3s; text-transform: uppercase; }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 100; }
-    </style>
 </head>
-<body class="flex min-h-screen">
+<body class="bg-[#02040a] text-slate-200 font-['Plus_Jakarta_Sans'] min-h-screen flex overflow-x-hidden">
 
     <!-- SIDEBAR -->
-    <aside class="sidebar p-8 sticky top-0 h-screen flex flex-col shrink-0">
+    <aside class="w-72 bg-[#080a12] border-r border-slate-900 p-8 sticky top-0 h-screen shrink-0">
         <div class="mb-12">
-            <img id="adminLogo" src="" class="h-10 object-contain">
-            <p class="text-[10px] tracking-[3px] text-blue-500 font-black uppercase mt-3">Elite System</p>
+            <img id="adminLogo" src="" class="h-10 object-contain mb-2">
+            <p class="text-[10px] tracking-[4px] text-blue-500 font-black uppercase">Admin Elite</p>
         </div>
-
-        <nav class="flex-1">
-            <button onclick="showPage('api')" id="n-api" class="nav-btn active-nav"><i class="fas fa-plug-circle-bolt mr-4"></i> API Sync</button>
-            <button onclick="showPage('services')" id="n-services" class="nav-btn"><i class="fas fa-boxes-stacked mr-4"></i> Services</button>
-            <button onclick="showPage('orders')" id="n-orders" class="nav-btn"><i class="fas fa-shopping-cart mr-4"></i> Orders</button>
-            <button onclick="showPage('users')" id="n-users" class="nav-btn"><i class="fas fa-user-gear mr-4"></i> Clients</button>
-            <button onclick="showPage('settings')" id="n-settings" class="nav-btn"><i class="fas fa-paint-brush mr-4"></i> Branding</button>
+        <nav class="space-y-3">
+            <button onclick="showPage('api')" id="n-api" class="w-full flex items-center p-4 rounded-2xl text-slate-500 hover:bg-blue-600 hover:text-white transition active-nav font-bold"><i class="fas fa-sync-alt mr-4"></i> API Sync</button>
+            <button onclick="showPage('services')" id="n-services" class="w-full flex items-center p-4 rounded-2xl text-slate-500 hover:bg-blue-600 hover:text-white transition font-bold"><i class="fas fa-th-list mr-4"></i> Services</button>
+            <button onclick="showPage('users')" id="n-users" class="w-full flex items-center p-4 rounded-2xl text-slate-500 hover:bg-blue-600 hover:text-white transition font-bold"><i class="fas fa-users mr-4"></i> Users</button>
+            <button onclick="showPage('branding')" id="n-branding" class="w-full flex items-center p-4 rounded-2xl text-slate-500 hover:bg-blue-600 hover:text-white transition font-bold"><i class="fas fa-image mr-4"></i> Branding</button>
         </nav>
     </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 p-12 max-w-7xl mx-auto">
-        
+    <!-- MAIN -->
+    <main class="flex-1 p-12 max-w-7xl mx-auto w-full">
         <header class="flex justify-between items-center mb-16">
-            <h1 id="pageTitle" class="text-4xl font-black italic text-white">API Sync</h1>
-            <div class="glass-card py-3 px-6 flex items-center gap-4">
-                <span class="text-xs font-black text-blue-500">ADMIN CONSOLE</span>
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-black italic">A</div>
-            </div>
+            <h1 id="pageTitle" class="text-4xl font-black italic uppercase tracking-tighter">API Master Sync</h1>
+            <div class="bg-blue-600/10 border border-blue-500/20 px-6 py-2 rounded-2xl text-blue-500 font-black text-xs">SUPER ADMIN</div>
         </header>
 
-        <!-- API SECTION -->
-        <section id="api-page" class="page-sec space-y-10">
-            <div class="glass-card p-10">
-                <h3 class="text-xl font-bold mb-8 text-blue-400">Provider Backend Integration</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <input type="text" id="apiUrl" placeholder="https://provider.com/api/v2" class="input-field">
-                    <input type="password" id="apiKey" placeholder="Your Secret API Key" class="input-field">
-                    <input type="number" id="profit" value="15" placeholder="Profit Margin %" class="input-field">
-                    <button onclick="fetchFromBackend()" class="btn-grad w-full">Fetch Services via Server</button>
+        <!-- API SYNC PAGE -->
+        <section id="api-page" class="page-sec space-y-8">
+            <div class="bg-[#0f172a] p-10 rounded-[40px] border border-slate-800 shadow-2xl">
+                <div class="flex justify-between items-center mb-10">
+                    <h3 class="text-xl font-bold text-blue-400 italic">Sync All Services</h3>
+                    <div class="flex gap-4">
+                        <input type="number" id="profit" value="15" class="w-24 bg-[#020617] border border-slate-800 p-2 rounded-xl text-center font-bold text-blue-400" title="Profit %">
+                        <span class="text-xs text-slate-500 mt-3">% Profit</span>
+                    </div>
+                </div>
+
+                <!-- THE TRICK BOX -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div class="space-y-6">
+                        <div class="bg-blue-600/5 p-6 rounded-3xl border border-blue-500/10">
+                            <p class="text-sm font-bold text-blue-400 mb-4 uppercase tracking-widest"><i class="fas fa-bolt mr-2"></i> Fast Sync Method</p>
+                            <p class="text-xs text-slate-400 leading-relaxed mb-6">
+                                ShadowSMM blocks automated servers. To bypass this, open the link below in a new tab, copy the text, and paste it here.
+                            </p>
+                            <div class="space-y-3">
+                                <input type="text" id="apiUrl" placeholder="Provider URL (with /api/v2)" class="w-full bg-[#020617] border border-slate-800 p-4 rounded-2xl text-sm">
+                                <input type="text" id="apiKey" placeholder="Your API Key" class="w-full bg-[#020617] border border-slate-800 p-4 rounded-2xl text-sm">
+                                <button onclick="openProviderLink()" class="w-full bg-slate-800 p-4 rounded-2xl font-black text-xs hover:bg-slate-700 transition">1. OPEN PROVIDER DATA LINK</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">2. Paste Copied JSON Data Here</label>
+                        <textarea id="jsonInput" rows="8" placeholder='[{"service":"1","name":"Service Example",...}]' class="w-full bg-[#020617] border border-slate-800 p-6 rounded-[32px] text-[10px] font-mono outline-none focus:border-blue-600 transition"></textarea>
+                        <button onclick="startSync()" class="w-full bg-blue-600 p-5 rounded-2xl font-black uppercase shadow-xl shadow-blue-600/20 hover:scale-[1.02] transition">Start 1-Click Sync</button>
+                    </div>
                 </div>
             </div>
-            <div id="apiLoading" class="hidden text-center"><i class="fas fa-atom fa-spin text-5xl text-blue-500"></i></div>
-            <div id="apiResults" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+            <!-- Sync Progress -->
+            <div id="syncStatus" class="hidden glass-card p-6 bg-emerald-500/10 border-emerald-500/20 text-emerald-500 font-bold text-center rounded-2xl">
+                <i class="fas fa-spinner fa-spin mr-3"></i> Syncing Services... Please wait.
+            </div>
         </section>
 
-        <!-- SERVICES SECTION -->
-        <section id="services-page" class="page-sec hidden space-y-8">
+        <!-- SERVICES PAGE -->
+        <section id="services-page" class="page-sec hidden space-y-6">
             <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold italic">Active Services</h2>
-                <button onclick="toggleModal(true)" class="bg-emerald-600 px-6 py-3 rounded-xl font-bold text-sm hover:bg-emerald-500">Add Manual</button>
+                <h2 class="text-2xl font-black italic">Inventory</h2>
+                <button onclick="deleteAllServices()" class="bg-red-600/10 text-red-500 border border-red-500/20 px-6 py-2 rounded-xl text-xs font-black">DELETE ALL</button>
             </div>
-            <div class="glass-card overflow-hidden">
+            <div class="bg-[#0f172a] rounded-[32px] overflow-hidden border border-slate-800">
                 <table class="w-full text-left">
-                    <thead class="bg-slate-900/50 text-[10px] text-slate-500 font-black uppercase">
-                        <tr><th class="p-6">Sort</th><th class="p-6">Icon</th><th class="p-6">Name</th><th class="p-6">Price</th><th class="p-6 text-center">Action</th></tr>
+                    <thead class="bg-slate-900/50 text-[10px] font-black uppercase text-slate-500">
+                        <tr><th class="p-6">Icon</th><th class="p-6">Service Name</th><th class="p-6">PKR Rate</th><th class="p-6 text-center">Action</th></tr>
                     </thead>
                     <tbody id="serviceTable" class="divide-y divide-slate-800"></tbody>
                 </table>
             </div>
         </section>
 
-        <!-- USERS SECTION -->
+        <!-- USERS PAGE -->
         <section id="users-page" class="page-sec hidden">
-            <h2 class="text-2xl font-bold mb-8 italic">Registered Clients</h2>
-            <div id="userGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"></div>
+            <h2 class="text-2xl font-black mb-8 italic">Clients Database</h2>
+            <div id="userGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
         </section>
 
-        <!-- ORDERS SECTION -->
-        <section id="orders-page" class="page-sec hidden">
-            <h2 class="text-2xl font-bold mb-8 italic">System Orders</h2>
-            <div class="glass-card overflow-hidden">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-900 text-slate-500 text-[10px] font-black uppercase">
-                        <tr><th class="p-6">ID</th><th class="p-6">User</th><th class="p-6">Service</th><th class="p-6">Status</th><th class="p-6">Action</th></tr>
-                    </thead>
-                    <tbody id="orderTable" class="divide-y divide-slate-800"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- BRANDING SECTION -->
-        <section id="settings-page" class="page-sec hidden">
-            <div class="glass-card p-10 max-w-xl">
-                <h2 class="text-2xl font-bold mb-6 text-blue-400">Branding</h2>
-                <input type="text" id="logoInp" placeholder="Logo Link (PNG/GIF)" class="input-field mb-6">
-                <button onclick="saveLogo()" class="btn-grad w-full">Update Global Logo</button>
+        <!-- BRANDING -->
+        <section id="branding-page" class="page-sec hidden">
+            <div class="bg-[#0f172a] p-10 rounded-[40px] max-w-xl border border-slate-800">
+                <h3 class="text-xl font-bold mb-6">Branding Settings</h3>
+                <input type="text" id="logoUrl" placeholder="Logo URL (PNG/GIF)" class="w-full bg-[#020617] border border-slate-800 p-4 rounded-2xl mb-6">
+                <button onclick="saveBranding()" class="w-full bg-blue-600 p-4 rounded-2xl font-black">SAVE LOGO</button>
             </div>
         </section>
 
     </main>
 
-    <!-- MANUAL MODAL -->
-    <div id="manualModal" class="modal-overlay">
-        <div class="glass-card p-10 w-full max-w-lg">
-            <h3 class="text-xl font-bold mb-8">Add Manual Service</h3>
-            <div class="space-y-4">
-                <input type="text" id="mName" placeholder="Service Name" class="input-field">
-                <input type="text" id="mCat" placeholder="Category" class="input-field">
-                <input type="number" id="mRate" placeholder="Price (PKR)" class="input-field">
-                <input type="text" id="mLogo" placeholder="Icon URL" class="input-field">
-                <div class="flex gap-4">
-                    <button onclick="addManual()" class="btn-grad flex-1 bg-emerald-600">Save</button>
-                    <button onclick="toggleModal(false)" class="p-4 bg-slate-800 rounded-xl">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SCRIPT -->
     <script src="config.js"></script>
     <script>
+        // NAVIGATION
         function showPage(id) {
             document.querySelectorAll('.page-sec').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-nav'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('bg-blue-600', 'text-white'));
             document.getElementById(id + '-page').classList.remove('hidden');
-            document.getElementById('n-' + id).classList.add('active-nav');
-            document.getElementById('pageTitle').innerText = id.toUpperCase();
+            document.getElementById('pageTitle').innerText = id.replace('-',' ').toUpperCase();
         }
 
-        function toggleModal(show) { document.getElementById('manualModal').style.display = show ? 'flex' : 'none'; }
-
-        // BRANDING LOGIC
+        // BRANDING
+        async function saveBranding() {
+            const url = document.getElementById('logoUrl').value;
+            await db.collection("settings").doc("branding").set({ logo: url });
+            alert("Logo Updated!");
+        }
         db.collection("settings").doc("branding").onSnapshot(doc => {
-            if(doc.exists && doc.data().logo) {
+            if(doc.exists) {
                 document.getElementById('adminLogo').src = doc.data().logo;
-                document.getElementById('logoInp').value = doc.data().logo;
+                document.getElementById('logoUrl').value = doc.data().logo;
             }
         });
-        async function saveLogo() {
-            const url = document.getElementById('logoInp').value;
-            await db.collection("settings").doc("branding").set({ logo: url }, {merge: true});
-            alert("Logo Updated Everywhere!");
-        }
 
-        // --- BACKEND TRICK FETCH ---
-        async function fetchFromBackend() {
+        // --- THE MAGIC SYNC TRICK ---
+        function openProviderLink() {
             const url = document.getElementById('apiUrl').value;
             const key = document.getElementById('apiKey').value;
-            const profit = document.getElementById('profit').value;
-            const resBox = document.getElementById('apiResults');
+            if(!url || !key) return alert("Please enter Provider URL and Key first!");
+            const fullLink = `${url}?action=services&key=${key}`;
+            window.open(fullLink, '_blank');
+        }
 
-            if(!url || !key) return alert("Fill URL & Key!");
-            document.getElementById('apiLoading').classList.remove('hidden');
-            resBox.innerHTML = "";
-
+        async function startSync() {
+            const jsonText = document.getElementById('jsonInput').value;
+            const margin = parseFloat(document.getElementById('profit').value);
+            
             try {
-                // Call our Vercel Serverless Function
-                const backend = `/api/fetchServices?url=${encodeURIComponent(url)}&key=${key}`;
-                const response = await fetch(backend);
-                const data = await response.json();
-
-                document.getElementById('apiLoading').classList.add('hidden');
-
-                if (data.error) throw new Error(data.error);
-
-                data.forEach(s => {
-                    resBox.innerHTML += `
-                    <div class="glass-card p-6 flex flex-col justify-between">
-                        <h4 class="font-bold text-[12px] h-10 overflow-hidden leading-tight text-slate-300">${s.name}</h4>
-                        <div class="mt-4 flex justify-between items-center border-t border-slate-800 pt-4">
-                            <span class="text-emerald-500 font-black">$${s.rate}</span>
-                            <button onclick="addOne('${s.service}', '${s.name.replace(/'/g,"")}', '${s.category.replace(/'/g,"")}', '${s.rate}', ${profit})" class="text-[10px] bg-slate-800 px-3 py-1 rounded-lg">Add</button>
-                        </div>
-                    </div>`;
-                });
-            } catch (err) {
-                alert("Fetch Error: " + err.message);
-                document.getElementById('apiLoading').classList.add('hidden');
+                const data = JSON.parse(jsonText);
+                if(!Array.isArray(data)) throw new Error("Invalid Format");
+                
+                document.getElementById('syncStatus').classList.remove('hidden');
+                
+                // Smart Sync Loop
+                for(let s of data) {
+                    await syncServiceToFirebase(s, margin);
+                }
+                
+                document.getElementById('syncStatus').classList.add('hidden');
+                document.getElementById('jsonInput').value = "";
+                alert(`Successfully Synced ${data.length} Services!`);
+            } catch (e) {
+                alert("Error: Data format is incorrect. Make sure you copied the WHOLE page from the provider link.");
             }
         }
 
-        async function addOne(id, name, cat, rate, profit) {
-            const pkrRate = parseFloat(rate) * 285;
-            const finalRate = pkrRate + (pkrRate * profit / 100);
-            await db.collection("services").doc(id).set({
-                name, category: cat, rate: finalRate.toFixed(2), providerID: id, sortOrder: 0, catLogo: "https://cdn-icons-png.flaticon.com/512/174/174855.png"
+        async function syncServiceToFirebase(s, margin) {
+            // PKR Conversion Logic (1 USD = 285 PKR + Profit)
+            const pkrRate = (parseFloat(s.rate) * 285);
+            const finalPrice = pkrRate + (pkrRate * margin / 100);
+
+            // Auto Logo Detection Logic
+            let logo = "https://cdn-icons-png.flaticon.com/512/174/174855.png"; // Default
+            const n = s.name.toLowerCase();
+            const c = s.category.toLowerCase();
+            
+            if(n.includes('instagram') || c.includes('instagram')) logo = "https://cdn-icons-png.flaticon.com/512/174/174855.png";
+            if(n.includes('facebook') || c.includes('facebook')) logo = "https://cdn-icons-png.flaticon.com/512/174/174848.png";
+            if(n.includes('youtube') || c.includes('youtube')) logo = "https://cdn-icons-png.flaticon.com/512/174/174883.png";
+            if(n.includes('tiktok') || c.includes('tiktok')) logo = "https://cdn-icons-png.flaticon.com/512/3046/3046121.png";
+            if(n.includes('telegram') || c.includes('telegram')) logo = "https://cdn-icons-png.flaticon.com/512/2111/2111646.png";
+
+            await db.collection("services").doc(s.service.toString()).set({
+                name: s.name,
+                category: s.category,
+                rate: finalPrice.toFixed(2),
+                providerID: s.service,
+                sortOrder: 0,
+                catLogo: logo
             });
         }
 
-        // --- REAL-TIME LISTENERS WITH NULL-SAFETY ---
-        db.collection("services").orderBy("sortOrder", "asc").onSnapshot(snap => {
-            const el = document.getElementById('serviceTable');
-            if(!el) return;
-            el.innerHTML = "";
+        // --- DATA LOADERS ---
+        db.collection("services").orderBy("category").onSnapshot(snap => {
+            const tb = document.getElementById('serviceTable');
+            if(!tb) return;
+            tb.innerHTML = "";
             snap.forEach(doc => {
                 const s = doc.data();
-                el.innerHTML += `<tr class="border-b border-slate-900">
-                    <td class="p-6"><button onclick="sortS('${doc.id}', 1)"><i class="fas fa-caret-down"></i></button></td>
-                    <td class="p-6"><img src="${s.catLogo}" class="w-8 h-8 rounded-lg object-contain bg-slate-800 p-1"></td>
-                    <td class="p-6 text-xs font-bold">${s.name}</td>
-                    <td class="p-6 text-emerald-500 font-black">Rs ${s.rate}</td>
-                    <td class="p-6 text-center">
-                        <button onclick="editL('${doc.id}')" class="text-slate-500 mr-2"><i class="fas fa-image"></i></button>
-                        <button onclick="deleteS('${doc.id}')" class="text-red-900"><i class="fas fa-trash"></i></button>
+                tb.innerHTML += `<tr class="border-b border-slate-900 hover:bg-slate-800/20 transition">
+                    <td class="p-6"><img src="${s.catLogo}" class="w-8 h-8 rounded-lg bg-slate-900 p-1 border border-slate-800"></td>
+                    <td class="p-6">
+                        <p class="text-[10px] text-blue-500 font-black uppercase mb-1">${s.category}</p>
+                        <p class="text-xs font-bold text-slate-300 truncate max-w-md">${s.name}</p>
                     </td>
+                    <td class="p-6 font-black text-emerald-500">Rs ${s.rate}</td>
+                    <td class="p-6 text-center"><button onclick="deleteService('${doc.id}')" class="text-red-900 hover:text-red-500"><i class="fas fa-trash"></i></button></td>
                 </tr>`;
             });
         });
 
         db.collection("users").onSnapshot(snap => {
-            const el = document.getElementById('userGrid');
-            if(!el) return;
-            el.innerHTML = "";
+            const gr = document.getElementById('userGrid');
+            if(!gr) return;
+            gr.innerHTML = "";
             snap.forEach(doc => {
                 const u = doc.data();
-                el.innerHTML += `<div class="glass-card p-10 text-center relative overflow-hidden">
-                    <div class="w-16 h-16 bg-blue-600/10 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-500 text-2xl font-black">U</div>
-                    <p class="text-xs font-black truncate">${u.email}</p>
-                    <p class="text-3xl font-black text-emerald-500 mt-4">Rs ${u.balance || 0}</p>
-                    <button onclick="addBalance('${doc.id}')" class="mt-6 w-full py-2 bg-slate-800 rounded-xl text-[10px] font-black">ADD PKR FUND</button>
+                gr.innerHTML += `<div class="bg-[#0f172a] p-10 rounded-[40px] border border-slate-800 text-center relative overflow-hidden shadow-2xl">
+                    <div class="w-20 h-20 purple-grad bg-blue-600/10 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-500 text-3xl font-black italic">U</div>
+                    <p class="text-xs font-black truncate text-slate-400 uppercase tracking-tighter">${u.email}</p>
+                    <p class="text-3xl font-black text-emerald-500 mt-6 tracking-tighter">Rs ${u.balance || 0}</p>
+                    <button onclick="addBalance('${doc.id}')" class="mt-8 w-full py-4 bg-slate-800 rounded-2xl text-[10px] font-black hover:bg-blue-600 transition tracking-widest shadow-lg">ADD PKR FUND</button>
                 </div>`;
             });
         });
 
-        db.collection("orders").onSnapshot(snap => {
-            const el = document.getElementById('orderTable');
-            if(!el) return;
-            el.innerHTML = "";
-            snap.forEach(doc => {
-                const o = doc.data();
-                el.innerHTML += `<tr class="border-b border-slate-900 text-xs">
-                    <td class="p-6 font-mono text-blue-400">#${doc.id.slice(0,6)}</td>
-                    <td class="p-6 font-bold">${o.userEmail}</td>
-                    <td class="p-6 max-w-xs truncate">${o.serviceName}</td>
-                    <td class="p-6 font-black">${o.status}</td>
-                    <td class="p-6">
-                        <select onchange="uStatus('${doc.id}', this.value)" class="bg-slate-900 border border-slate-800 p-1 rounded-lg text-[10px]">
-                            <option value="">Update</option>
-                            <option value="Processing">Processing</option>
-                            <option value="Completed">Completed</option>
-                        </select>
-                    </td>
-                </tr>`;
-            });
-        });
-
-        // ACTIONS
-        async function addManual() {
-            const n = document.getElementById('mName').value;
-            const c = document.getElementById('mCat').value;
-            const r = document.getElementById('mRate').value;
-            const l = document.getElementById('mLogo').value || "https://cdn-icons-png.flaticon.com/512/174/174855.png";
-            await db.collection("services").add({ name: n, category: c, rate: parseFloat(r).toFixed(2), providerID: "manual", sortOrder: 0, catLogo: l });
-            alert("Added!"); toggleModal(false);
+        async function addBalance(uid) {
+            const amt = prompt("Enter Amount to Add (PKR):");
+            if(amt) {
+                const ref = db.collection("users").doc(uid);
+                const d = await ref.get();
+                await ref.update({ balance: parseFloat(d.data().balance || 0) + parseFloat(amt) });
+                alert("Fund Added!");
+            }
         }
-        async function deleteS(id) { if(confirm("Delete?")) await db.collection("services").doc(id).delete(); }
-        async function sortS(id, v) { const ref = db.collection("services").doc(id); const d = await ref.get(); await ref.update({ sortOrder: (d.data().sortOrder || 0) + v }); }
-        async function editL(id) { const n = prompt("GIF/Logo Link:"); if(n) await db.collection("services").doc(id).update({ catLogo: n }); }
-        async function addBalance(uid) { const amt = prompt("Amount (PKR):"); if(amt) { const ref = db.collection("users").doc(uid); const d = await ref.get(); await ref.update({ balance: parseFloat(d.data().balance || 0) + parseFloat(amt) }); } }
-        async function uStatus(id, s) { if(s) await db.collection("orders").doc(id).update({ status: s }); }
+
+        async function deleteService(id) { if(confirm("Delete service?")) await db.collection("services").doc(id).delete(); }
+        async function deleteAllServices() { if(confirm("This will delete ALL services. Are you sure?")) {
+            const snap = await db.collection("services").get();
+            snap.forEach(doc => doc.ref.delete());
+            alert("All deleted.");
+        }}
     </script>
 </body>
 </html>
