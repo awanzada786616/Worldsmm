@@ -1,0 +1,387 @@
+--- START OF FILE deepseek_html_20260412_76029b.html ---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SMM ELITE | Super Admin - Fixed API Sync</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDKs (Using Compat version for stability) -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #02040a; color: #f1f5f9; overflow-x: hidden; }
+        .sidebar { width: 280px; background: #080a12; border-right: 1px solid #1e293b; z-index: 50; }
+        .glass-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 24px; backdrop-filter: blur(4px); }
+        .nav-btn { display: flex; align-items: center; padding: 16px 20px; border-radius: 14px; color: #64748b; font-weight: 600; width: 100%; margin-bottom: 8px; transition: 0.3s; }
+        .nav-btn:hover, .active-nav { background: #1d4ed8; color: white; box-shadow: 0 10px 20px rgba(29, 78, 216, 0.2); }
+        .input-field { background: #020617; border: 1px solid #1e293b; padding: 14px; border-radius: 12px; width: 100%; color: white; outline: none; transition: 0.2s; }
+        .input-field:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.3); }
+        .btn-primary { background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 14px 28px; border-radius: 12px; font-weight: 800; transition: 0.3s; cursor: pointer; border: none; }
+        .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn-secondary { background: #1e293b; padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(12px); display: none; align-items: center; justify-content: center; z-index: 100; }
+        .page-content { display: none; animation: fadeIn 0.3s ease; }
+        .active-page { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .service-card { transition: all 0.2s; }
+        .service-card:hover { transform: scale(1.02); border-color: #3b82f6; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body class="flex min-h-screen">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar p-8 sticky top-0 h-screen flex flex-col shrink-0">
+        <div class="mb-12">
+            <img id="adminLogo" src="https://i.imgur.com/9QqNl0M.png" class="h-10 object-contain" alt="logo">
+            <p class="text-[10px] tracking-[3px] text-blue-500 font-black uppercase mt-3 italic">SUPER ADMIN</p>
+        </div>
+        <nav class="flex-1">
+            <button onclick="navTo('dash')" id="n-dash" class="nav-btn active-nav"><i class="fas fa-gauge-high mr-4"></i> Dashboard</button>
+            <button onclick="navTo('api')" id="n-api" class="nav-btn"><i class="fas fa-network-wired mr-4"></i> API Sync</button>
+            <button onclick="navTo('svcs')" id="n-svcs" class="nav-btn"><i class="fas fa-list mr-4"></i> Services</button>
+            <button onclick="navTo('orders')" id="n-orders" class="nav-btn"><i class="fas fa-cart-shopping mr-4"></i> Orders</button>
+            <button onclick="navTo('users')" id="n-users" class="nav-btn"><i class="fas fa-users-gear mr-4"></i> Users</button>
+            <button onclick="navTo('brand')" id="n-brand" class="nav-btn"><i class="fas fa-palette mr-4"></i> Branding</button>
+        </nav>
+        <div class="mt-auto pt-8 text-xs text-slate-600 text-center">SMM ELITE v2.0</div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="flex-1 p-12 max-w-7xl mx-auto w-full">
+        
+        <!-- HEADER -->
+        <header class="flex justify-between items-center mb-12 flex-wrap gap-4">
+            <h1 id="pageTitle" class="text-4xl font-black italic bg-gradient-to-r from-blue-400 to-white bg-clip-text text-transparent">Dashboard</h1>
+            <div class="glass-card py-3 px-6 flex items-center gap-4">
+                <span class="text-xs font-black text-blue-500">SUPER ADMIN</span>
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center font-bold shadow-lg">AD</div>
+            </div>
+        </header>
+
+        <!-- DASHBOARD PAGE -->
+        <section id="page-dash" class="page-content active-page">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass-card p-8 border-l-8 border-l-blue-600">
+                    <p class="text-xs text-slate-500 font-bold uppercase mb-2"><i class="fas fa-users mr-2"></i> Total Users</p>
+                    <h2 class="text-4xl font-black" id="stat-users">0</h2>
+                </div>
+                <div class="glass-card p-8 border-l-8 border-l-emerald-600">
+                    <p class="text-xs text-slate-500 font-bold uppercase mb-2"><i class="fas fa-shopping-cart mr-2"></i> Total Orders</p>
+                    <h2 class="text-4xl font-black" id="stat-orders">0</h2>
+                </div>
+                <div class="glass-card p-8 border-l-8 border-l-amber-600">
+                    <p class="text-xs text-slate-500 font-bold uppercase mb-2"><i class="fas fa-rupee-sign mr-2"></i> Total Revenue (PKR)</p>
+                    <h2 class="text-4xl font-black text-emerald-400" id="stat-rev">Rs 0</h2>
+                </div>
+            </div>
+            <div class="mt-10 glass-card p-6 text-center text-slate-400 text-sm">
+                <i class="fas fa-database mr-2"></i> Real-time data from Firebase | API Sync supports multiple providers
+            </div>
+        </section>
+
+        <!-- API SYNC PAGE -->
+        <section id="page-api" class="page-content space-y-8">
+            <div class="glass-card p-10">
+                <h3 class="text-2xl font-bold mb-6 text-blue-500"><i class="fas fa-cloud-upload-alt mr-3"></i> Smart Provider Sync</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <input type="text" id="apiUrl" placeholder="https://yourprovider.com/api/v2" class="input-field" value="https://shadowsmm.com/api/v2">
+                    <input type="text" id="apiKey" placeholder="Your API Key" class="input-field">
+                    <input type="number" id="profit" value="20" placeholder="Profit %" class="input-field">
+                    <div class="flex gap-3">
+                        <button onclick="fetchServicesWithFallback()" class="btn-primary flex-1"><i class="fas fa-sync-alt mr-2"></i> Fetch & Preview</button>
+                        <button onclick="showManualApiModal()" class="bg-slate-800 px-5 rounded-xl font-bold"><i class="fas fa-paste"></i> Manual JSON</button>
+                    </div>
+                </div>
+            </div>
+            <div id="apiResults" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- SERVICES PAGE -->
+        <section id="page-svcs" class="page-content space-y-6">
+            <div class="flex justify-between items-center flex-wrap gap-4">
+                <h2 class="text-2xl font-bold"><i class="fas fa-cubes mr-3 text-blue-500"></i>Service Inventory</h2>
+                <button onclick="toggleModal('mModal', true)" class="bg-emerald-600 hover:bg-emerald-500 px-6 py-3 rounded-xl font-bold text-sm shadow-lg transition"><i class="fas fa-plus mr-2"></i> Add Manual Service</button>
+            </div>
+            <div class="glass-card overflow-x-auto">
+                <table class="w-full text-left min-w-[600px]">
+                    <thead class="bg-slate-900/70 text-[11px] font-black uppercase text-slate-400">
+                        <tr><th class="p-5">Icon</th><th class="p-5">Service Name</th><th class="p-5">Rate (PKR)</th><th class="p-5 text-center">Action</th></tr>
+                    </thead>
+                    <tbody id="serviceTable" class="divide-y divide-slate-800/60"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- USERS PAGE -->
+        <section id="page-users" class="page-content">
+             <h2 class="text-2xl font-bold mb-6"><i class="fas fa-users mr-3 text-blue-500"></i>Manage Users</h2>
+            <div id="userGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- ORDERS PAGE -->
+        <section id="page-orders" class="page-content">
+            <div class="glass-card overflow-x-auto">
+                <table class="w-full text-left min-w-[700px]">
+                    <thead class="bg-slate-900 text-[11px] uppercase font-black">
+                        <tr><th class="p-5">Order ID</th><th class="p-5">User</th><th class="p-5">Service</th><th class="p-5">Status</th><th class="p-5">Action</th></tr>
+                    </thead>
+                    <tbody id="orderTable" class="divide-y divide-slate-800"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- BRANDING PAGE -->
+        <section id="page-brand" class="page-content">
+            <div class="glass-card p-10 max-w-xl">
+                <h2 class="text-2xl font-bold mb-6"><i class="fas fa-brush mr-2"></i> Panel Branding</h2>
+                <input type="text" id="logoUrl" placeholder="Logo Image URL" class="input-field mb-6">
+                <div class="flex gap-4">
+                    <button onclick="saveLogo()" class="btn-primary flex-1">Save Logo</button>
+                    <button onclick="previewLogo()" class="bg-slate-800 px-6 rounded-xl">Preview</button>
+                </div>
+                <div class="mt-6 p-4 bg-slate-800/40 rounded-xl text-center">
+                    <img id="logoPreview" src="" class="h-12 mx-auto object-contain">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MANUAL MODAL -->
+    <div id="mModal" class="modal">
+        <div class="glass-card p-10 w-full max-w-lg mx-4">
+            <h3 class="text-2xl font-bold mb-6 text-blue-400"><i class="fas fa-hand-sparkles mr-2"></i>Create Custom Service</h3>
+            <div class="space-y-4">
+                <input type="text" id="mName" placeholder="Service Name" class="input-field">
+                <input type="text" id="mCat" placeholder="Category (e.g., Instagram, TikTok)" class="input-field">
+                <input type="number" id="mPrice" placeholder="Price (PKR)" class="input-field">
+                <input type="text" id="mLogo" placeholder="Icon URL (optional)" class="input-field">
+                <button onclick="addManual()" class="btn-primary w-full">Create Service</button>
+                <button onclick="toggleModal('mModal', false)" class="w-full text-slate-400 hover:text-white font-bold mt-2">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Manual JSON paste modal -->
+    <div id="jsonModal" class="modal">
+        <div class="glass-card p-8 w-full max-w-3xl">
+            <h3 class="text-xl font-bold mb-4">Paste Provider JSON Response</h3>
+            <textarea id="manualJsonData" rows="10" class="input-field font-mono text-sm" placeholder='[{"service": 1, "name": "Example", "category": "Social", "rate": 0.5}]'></textarea>
+            <div class="flex gap-3 mt-5">
+                <button onclick="processManualJson()" class="btn-primary">Sync Services</button>
+                <button onclick="toggleModal('jsonModal', false)" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE INITIALIZATION -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyA44TLKBn93R8SxgmcVWAjr6wI3SQSTvM0",
+            authDomain: "wasi-smm.firebaseapp.com",
+            databaseURL: "https://wasi-smm-default-rtdb.firebaseio.com",
+            projectId: "wasi-smm",
+            storageBucket: "wasi-smm.firebasestorage.app",
+            messagingSenderId: "100481136940",
+            appId: "1:100481136940:web:6dbb01efebc0774957d489"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        console.log("Firebase Connected to:", firebaseConfig.projectId);
+    </script>
+
+    <script>
+        let previewServices = [];
+
+        function navTo(page) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active-page'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-nav'));
+            const targetPage = document.getElementById('page-' + page);
+            if(targetPage) targetPage.classList.add('active-page');
+            const targetBtn = document.getElementById('n-' + page);
+            if(targetBtn) targetBtn.classList.add('active-nav');
+            document.getElementById('pageTitle').innerText = page.charAt(0).toUpperCase() + page.slice(1);
+        }
+
+        function toggleModal(id, show) { 
+            const el = document.getElementById(id);
+            if(el) el.style.display = show ? 'flex' : 'none'; 
+        }
+
+        function showManualApiModal() { toggleModal('jsonModal', true); }
+
+        // Fetch API logic
+        async function fetchServicesWithFallback() {
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const profitPercent = parseFloat(document.getElementById('profit').value) || 0;
+            const resultsDiv = document.getElementById('apiResults');
+            
+            if(!apiUrl || !apiKey) { alert("Please provide API URL and Key"); return; }
+            
+            resultsDiv.innerHTML = `<div class="col-span-full p-10 text-center"><i class="fas fa-spinner fa-spin text-4xl text-blue-500"></i></div>`;
+            
+            const endpoint = `${apiUrl}?action=services&key=${apiKey}`;
+            const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(endpoint)}`;
+
+            try {
+                const res = await fetch(proxy);
+                const data = await res.json();
+                const services = Array.isArray(data) ? data : data.services;
+
+                if(!services) throw new Error("Invalid format");
+
+                previewServices = services;
+                resultsDiv.innerHTML = `<div class="col-span-full flex justify-between bg-slate-800 p-4 rounded-xl mb-4">
+                    <span>Found ${services.length} services</span>
+                    <button onclick="confirmSyncAll()" class="bg-emerald-600 px-4 py-1 rounded">Sync All to Firebase</button>
+                </div>`;
+
+                services.slice(0, 15).forEach(s => {
+                    resultsDiv.innerHTML += `
+                        <div class="glass-card p-4 text-xs">
+                            <p class="font-bold text-blue-400">${s.service} - ${s.name}</p>
+                            <p class="text-slate-500">${s.category}</p>
+                            <p class="mt-2 text-emerald-400 font-bold">$${s.rate}</p>
+                        </div>
+                    `;
+                });
+
+            } catch(e) {
+                resultsDiv.innerHTML = `<div class="col-span-full text-red-500 p-10 text-center">Fetch failed. Try Manual JSON.</div>`;
+            }
+        }
+
+        async function confirmSyncAll() {
+            if(!previewServices.length) return;
+            const profit = parseFloat(document.getElementById('profit').value) || 0;
+            const ratePKR = 285; // Example conversion rate
+
+            for(let s of previewServices) {
+                const basePrice = parseFloat(s.rate) * ratePKR;
+                const finalPrice = basePrice + (basePrice * profit / 100);
+                
+                await db.ref('services/' + s.service).set({
+                    name: s.name,
+                    category: s.category,
+                    rate: finalPrice.toFixed(2),
+                    providerID: s.service,
+                    catLogo: "https://cdn-icons-png.flaticon.com/512/1041/1041916.png"
+                });
+            }
+            alert("Services Synced Successfully!");
+            navTo('svcs');
+        }
+
+        // --- REAL-TIME DATA LISTENERS ---
+        function loadData() {
+            // Users Listener
+            db.ref('users').on('value', snap => {
+                const userGrid = document.getElementById('userGrid');
+                const statUsers = document.getElementById('stat-users');
+                if(statUsers) statUsers.innerText = snap.numChildren();
+                
+                if(userGrid) {
+                    userGrid.innerHTML = '';
+                    snap.forEach(child => {
+                        const u = child.val();
+                        userGrid.innerHTML += `
+                            <div class="glass-card p-6 border-t-4 border-blue-500">
+                                <p class="text-xs text-slate-500 font-bold">${child.key}</p>
+                                <p class="font-bold truncate">${u.email || 'No Email'}</p>
+                                <h3 class="text-2xl font-black text-emerald-400 mt-2">Rs ${u.balance || 0}</h3>
+                                <button onclick="addFund('${child.key}')" class="mt-4 w-full bg-slate-800 py-2 rounded-lg text-xs font-bold hover:bg-blue-600 transition">Add Funds</button>
+                            </div>
+                        `;
+                    });
+                }
+            });
+
+            // Services Listener
+            db.ref('services').on('value', snap => {
+                const svcTable = document.getElementById('serviceTable');
+                if(svcTable) {
+                    svcTable.innerHTML = '';
+                    snap.forEach(child => {
+                        const s = child.val();
+                        svcTable.innerHTML += `
+                            <tr>
+                                <td class="p-5"><img src="${s.catLogo}" class="w-8 h-8"></td>
+                                <td class="p-5 font-bold">${s.name}</td>
+                                <td class="p-5 text-emerald-400 font-black">Rs ${s.rate}</td>
+                                <td class="p-5 text-center"><button onclick="deleteService('${child.key}')" class="text-red-500"><i class="fas fa-trash"></i></button></td>
+                            </tr>
+                        `;
+                    });
+                }
+            });
+
+            // Orders Listener
+            db.ref('orders').on('value', snap => {
+                const orderTable = document.getElementById('orderTable');
+                const statOrders = document.getElementById('stat-orders');
+                const statRev = document.getElementById('stat-rev');
+                if(statOrders) statOrders.innerText = snap.numChildren();
+
+                let rev = 0;
+                if(orderTable) {
+                    orderTable.innerHTML = '';
+                    snap.forEach(child => {
+                        const o = child.val();
+                        rev += parseFloat(o.amount || 0);
+                        orderTable.innerHTML += `
+                            <tr class="text-xs">
+                                <td class="p-4 font-mono">#${child.key.slice(0,6)}</td>
+                                <td class="p-4">${o.userEmail || 'User'}</td>
+                                <td class="p-4">${o.serviceName || 'Service'}</td>
+                                <td class="p-4"><span class="bg-blue-900 px-2 py-1 rounded">${o.status || 'Pending'}</span></td>
+                                <td class="p-4"><select onchange="updateStatus('${child.key}', this.value)" class="bg-black border border-slate-700 text-[10px] p-1 rounded">
+                                    <option value="">Update</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select></td>
+                            </tr>
+                        `;
+                    });
+                }
+                if(statRev) statRev.innerText = "Rs " + rev.toFixed(2);
+            });
+        }
+
+        // Database Helpers
+        async function addFund(uid) {
+            const amt = prompt("Enter amount to add (PKR):");
+            if(amt && !isNaN(amt)) {
+                const ref = db.ref('users/' + uid + '/balance');
+                const snap = await ref.once('value');
+                const current = parseFloat(snap.val() || 0);
+                await ref.set(current + parseFloat(amt));
+                alert("Funds added!");
+            }
+        }
+
+        async function deleteService(id) {
+            if(confirm("Delete service?")) await db.ref('services/' + id).remove();
+        }
+
+        async function updateStatus(id, val) {
+            if(val) await db.ref('orders/' + id).update({ status: val });
+        }
+
+        // Initialize
+        window.onload = loadData;
+    </script>
+</body>
+</html>
