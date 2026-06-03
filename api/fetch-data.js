@@ -1,60 +1,50 @@
 export default async function handler(req, res) {
     const { cnic } = req.query;
-    if (!cnic) return res.status(400).json({ error: "CNIC required" });
+    if (!cnic) return res.status(400).send("CNIC missing");
 
-    const url = 'https://leakedhub.hasnaint.com/cnic_record.php';
+    const targetUrl = 'https://leakedhub.hasnaint.com/cnic_record.php';
 
     try {
-        // 1. Pehle Login Request bhejna
-        const loginParams = new URLSearchParams();
-        loginParams.append('username', 'Shah001'); 
-        loginParams.append('password', 'Shah001@');
-        loginParams.append('login', ''); // Button click simulate karne ke liye
+        // STEP 1: Login karna aur Cookie lena
+        const loginData = new URLSearchParams();
+        loginData.append('username', 'Shah001'); 
+        loginData.append('password', 'Shah001@');
+        loginData.append('login', 'login'); // Button name aksar 'login' hota hai
 
-        const loginResponse = await fetch(url, {
+        const loginRes = await fetch(targetUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
             },
-            body: loginParams,
-            redirect: 'manual' // Redirect handle karne ke liye
+            body: loginData
         });
 
-        // Sari Cookies nikalna (Node.js 18+ method)
-        const rawCookies = loginResponse.headers.getSetCookie();
-        const cookieString = rawCookies.map(c => c.split(';')[0]).join('; ');
+        // Sari cookies akathi karna
+        const cookies = loginRes.headers.getSetCookie().map(c => c.split(';')[0]).join('; ');
 
-        if (!cookieString || cookieString === "") {
-            return res.status(500).json({ error: "Cookie nahi mili. Login fail ho gaya." });
-        }
+        // STEP 2: Ab usi cookie ke sath CNIC search karna
+        const searchData = new URLSearchParams();
+        searchData.append('cnic', cnic);
 
-        // 2. Ab Data Fetch karna unhi Cookies ke saath
-        const searchParams = new URLSearchParams();
-        searchParams.append('cnic', cnic);
-
-        const dataResponse = await fetch(url, {
+        const finalRes = await fetch(targetUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'Cookie': cookieString,
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
-                'Referer': url
+                'Cookie': cookies,
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+                'Referer': targetUrl
             },
-            body: searchParams
+            body: searchData
         });
 
-        let htmlData = await dataResponse.text();
+        const finalHtml = await finalRes.text();
 
-        // Cleaning: Hamari site par unka login box na nazar aaye agar data mil jaye
-        if (htmlData.includes('Shah001')) {
-            // Success: User logged in hai
-            res.status(200).send(htmlData);
-        } else {
-            res.status(403).send("Data fetch nahi ho saka. Login session rejected.");
-        }
+        // Seedha HTML bhej dena (Bina kisi error check ke)
+        res.setHeader('Content-Type', 'text/html');
+        res.status(200).send(finalHtml);
 
     } catch (error) {
-        res.status(500).json({ error: "Error: " + error.message });
+        res.status(500).send("System Error: " + error.message);
     }
 }
