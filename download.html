@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streamable Video Player</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .video-container {
+            width: 100%;
+            max-width: 700px;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .download-section {
+            margin-top: 20px;
+        }
+        .btn-download {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            font-size: 18px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: 0.3s;
+            display: inline-block;
+        }
+        .btn-download:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Video Player</h2>
+
+    <!-- Video Player Box -->
+    <div class="video-container">
+        <div style="width:100%;height:0px;position:relative;padding-bottom:56.250%;">
+            <iframe src="https://streamable.com/e/vspl9o" 
+                    frameborder="0" width="100%" height="100%" 
+                    allowfullscreen 
+                    style="width:100%;height:100%;position:absolute;left:0px;top:0px;overflow:hidden;">
+            </iframe>
+        </div>
+    </div>
+
+    <!-- Download Button Section -->
+    <div class="download-section">
+        <!-- Note: Streamable direct links expire, so we link to the video page -->
+        <a href="https://streamable.com/vspl9o" target="_blank" class="btn-download">
+            Download Video
+        </a>
+    </div>
+
+    <p style="margin-top: 10px; color: #666;">Click on "Download" and then use 'Save Video As' from the menu.</p>
+
+</body>
+</html>
