@@ -37,48 +37,45 @@
             animation: spin 1s linear infinite; margin-top: 20px;
         }
 
-        /* --- HEADER & HIGH QUALITY SEARCH BAR --- */
+        /* --- HEADER & SEARCH BAR --- */
         header {
             padding: 10px 4%; display: flex; align-items: center; justify-content: space-between;
-            background: rgba(0,0,0,0.9); border-bottom: 1px solid #333;
-            position: sticky; top: 0; z-index: 1000; gap: 15px;
+            background: rgba(0,0,0,0.95); border-bottom: 1px solid #333;
+            position: sticky; top: 0; z-index: 1000; gap: 15px; backdrop-filter: blur(10px);
         }
         .logo-box { display: flex; align-items: center; gap: 8px; cursor: pointer; flex-shrink: 0; }
         .logo-box i { color: var(--gold); font-size: 1.6rem; }
-        .logo-box span { font-weight: 800; font-size: 1.3rem; letter-spacing: -0.5px; }
+        .logo-box span { font-weight: 800; font-size: 1.4rem; letter-spacing: -0.5px; color: #fff; }
 
         .search-wrapper { 
             flex: 1; max-width: 600px; position: relative; 
             display: flex; align-items: center;
         }
         .search-wrapper input {
-            width: 100%; padding: 12px 45px 12px 20px; border-radius: 8px; border: 1px solid #333;
+            width: 100%; padding: 12px 45px 12px 20px; border-radius: 30px; border: 1px solid #333;
             background: #111; color: white; outline: none; font-size: 14px;
-            transition: 0.3s; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            transition: 0.3s;
         }
-        .search-wrapper input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(255,0,0,0.3); }
+        .search-wrapper input:focus { border-color: var(--primary); background: #000; box-shadow: 0 0 15px rgba(255,0,0,0.2); }
         .search-wrapper .search-btn {
-            position: absolute; right: 10px; background: none; border: none; 
-            color: #777; cursor: pointer; font-size: 1.1rem; transition: 0.3s;
+            position: absolute; right: 15px; background: none; border: none; 
+            color: #777; cursor: pointer; font-size: 1.1rem;
         }
-        .search-wrapper .search-btn:hover { color: var(--primary); }
 
         /* --- SIDE MENU --- */
-        .menu-toggle { font-size: 1.4rem; cursor: pointer; color: var(--gold); }
+        .menu-toggle { font-size: 1.4rem; cursor: pointer; color: #fff; }
         #sidebar {
             position: fixed; top: 0; left: -300px; width: 280px; height: 100%;
             background: #0f0f0f; z-index: 2000; transition: 0.4s; padding: 30px 20px;
             box-shadow: 15px 0 40px rgba(0,0,0,0.8);
         }
         #sidebar.active { left: 0; }
-        .side-title { color: var(--gold); font-size: 1.5rem; font-weight: 800; margin-bottom: 30px; border-bottom: 1px solid #222; padding-bottom: 10px; }
+        .side-title { color: var(--gold); font-size: 1.5rem; font-weight: 800; margin-bottom: 30px; }
         .side-link { 
             padding: 14px 18px; display: flex; align-items: center; gap: 15px; 
             text-decoration: none; color: #ccc; border-radius: 8px; margin-bottom: 8px; transition: 0.3s;
-            font-weight: 500;
         }
-        .side-link:hover { background: #222; color: #fff; transform: translateX(5px); }
-        .side-link i { width: 20px; text-align: center; color: var(--primary); }
+        .side-link:hover { background: #222; color: #fff; }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 1500; }
 
         /* --- MAIN LAYOUT --- */
@@ -86,22 +83,22 @@
         #main-view { flex: 1; }
         #side-view { width: 350px; }
 
-        /* --- CARDS & GRID --- */
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-        .king-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; cursor: pointer; transition: 0.3s; border: 1px solid #222; }
-        .king-card:hover { border-color: #444; transform: translateY(-5px); }
-        .king-thumb { width: 100%; aspect-ratio: 16/9; background: #000; overflow: hidden; }
-        .king-thumb img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .king-card:hover .king-thumb img { transform: scale(1.05); }
-        .king-info { padding: 12px; }
-        .king-title { font-size: 14px; font-weight: 600; line-height: 1.3; height: 38px; overflow: hidden; margin-bottom: 8px; }
-        .king-meta { font-size: 12px; color: #888; display: flex; align-items: center; gap: 5px; }
+        /* --- VIDEO CARDS --- */
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .king-card { background: transparent; border-radius: 12px; overflow: hidden; cursor: pointer; transition: 0.3s; }
+        .king-thumb { width: 100%; aspect-ratio: 16/9; background: #222; border-radius: 12px; overflow: hidden; position: relative; }
+        .king-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .king-info { padding: 12px 5px; }
+        .king-title { font-size: 14px; font-weight: 600; line-height: 1.4; max-height: 40px; overflow: hidden; margin-bottom: 5px; color: #fff; }
+        .king-meta { font-size: 12px; color: #aaa; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+        .time-tag { color: #888; font-weight: 400; }
+        .time-tag::before { content: "•"; margin-right: 5px; }
 
         /* --- PLAYER --- */
-        .player-box { width: 100%; background: #000; border-radius: 15px; overflow: hidden; aspect-ratio: 16/9; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .player-box { width: 100%; background: #000; border-radius: 15px; overflow: hidden; aspect-ratio: 16/9; margin-bottom: 15px; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* --- WHATSAPP DIALOG --- */
+        /* --- WHATSAPP POPUP --- */
         #wa-popup {
             position: fixed; bottom: -100%; left: 50%; transform: translateX(-50%);
             background: white; color: black; padding: 25px; border-radius: 20px 20px 0 0;
@@ -109,7 +106,7 @@
             transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         #wa-popup.show { bottom: 0; }
-        .wa-confirm-btn { background: #25d366; color: white; padding: 12px 30px; border-radius: 50px; text-decoration: none; display: inline-block; font-weight: 700; margin-top: 15px; }
+        .wa-btn { background: #25d366; color: white; padding: 12px 30px; border-radius: 50px; text-decoration: none; display: inline-block; font-weight: 700; margin-top: 15px; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes scaleUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -117,7 +114,6 @@
         @media (max-width: 900px) {
             .app-container { flex-direction: column; }
             #side-view { width: 100%; }
-            header { padding: 10px 15px; }
             .logo-box span { display: none; }
         }
     </style>
@@ -135,84 +131,69 @@
     <div id="sidebar">
         <div class="side-title">KINGTUBE</div>
         <a href="#" class="side-link" onclick="location.reload()"><i class="fas fa-home"></i> Home</a>
-        <a href="https://chat.whatsapp.com/EZhxFOubSr4IWqANqsi2AL" target="_blank" class="side-link"><i class="fab fa-whatsapp"></i> Join WhatsApp Group</a>
-        <!-- Contact Developer Button -->
-        <a href="https://wa.me/923012709322" target="_blank" class="side-link" style="background: rgba(255,204,0,0.1); border: 1px solid var(--gold);"><i class="fas fa-headset"></i> Contact Developer</a>
+        <a href="https://chat.whatsapp.com/EZhxFOubSr4IWqANqsi2AL" target="_blank" class="side-link"><i class="fab fa-whatsapp"></i> Join Community</a>
+        <!-- Contact Developer Link -->
+        <a href="https://wa.me/923012709322" target="_blank" class="side-link" style="background: rgba(255,204,0,0.1); border: 1px solid var(--gold);"><i class="fas fa-code"></i> Contact Developer</a>
         <a href="#" class="side-link"><i class="fas fa-heart"></i> Favorites</a>
-        <a href="#" class="side-link"><i class="fas fa-history"></i> Watch History</a>
     </div>
 
     <!-- Header -->
     <header>
         <div class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
-        
         <div class="logo-box" onclick="location.reload()">
             <i class="fas fa-crown"></i>
             <span>KING<span style="color:var(--primary)">TUBE</span></span>
         </div>
-
         <div class="search-wrapper">
-            <input type="text" id="search-input" placeholder="Search movies, series, videos...">
+            <input type="text" id="search-input" placeholder="Search movies or videos...">
             <button class="search-btn" onclick="triggerSearch()"><i class="fas fa-search"></i></button>
         </div>
-
-        <div style="width: 40px; text-align: right;"><i class="fas fa-user-circle" style="font-size: 1.5rem; color: #555;"></i></div>
+        <div><i class="fas fa-user-circle" style="font-size: 1.5rem; color: #444;"></i></div>
     </header>
 
-    <!-- Main Content -->
+    <!-- Content -->
     <div class="app-container">
         <main id="main-view"></main>
         <aside id="side-view"></aside>
     </div>
 
-    <!-- WhatsApp Popup -->
+    <!-- WA Popup -->
     <div id="wa-popup">
-        <i class="fab fa-whatsapp" style="font-size: 3.5rem; color: #25d366;"></i>
-        <h2 style="margin-top: 10px;">KingTube Community</h2>
-        <p style="color: #666; margin-top: 5px;">Latest Hollywood Movies aur Updates ke liye hamara group join karen.</p>
-        <a href="https://chat.whatsapp.com/EZhxFOubSr4IWqANqsi2AL" class="wa-btn wa-confirm-btn">JOIN GROUP NOW</a>
+        <i class="fab fa-whatsapp" style="font-size: 3rem; color: #25d366;"></i>
+        <h2 style="margin-top:10px">KingTube Community</h2>
+        <p>Latest movies aur daily updates ke liye join karen.</p>
+        <a href="https://chat.whatsapp.com/EZhxFOubSr4IWqANqsi2AL" class="wa-btn">JOIN GROUP</a>
         <br>
-        <button onclick="closePopup()" style="margin-top: 15px; border: none; background: none; color: #aaa; cursor: pointer; font-weight: 600;">CLOSE</button>
+        <button onclick="closePopup()" style="margin-top:15px; border:none; background:none; color:#999; cursor:pointer;">CLOSE</button>
     </div>
 
     <script>
-        const API_NODES = [
-            "https://api.piped.private.coffee",
-            "https://pipedapi.mha.fi",
-            "https://inv.nadeko.net"
-        ];
+        const API_NODES = ["https://api.piped.private.coffee", "https://pipedapi.mha.fi", "https://inv.nadeko.net"];
 
-        // UI Controls
         function toggleMenu() {
             document.getElementById('sidebar').classList.toggle('active');
-            const display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
-            document.querySelector('.overlay').style.display = display;
+            document.querySelector('.overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
         }
 
         window.addEventListener('load', () => {
             setTimeout(() => {
                 document.getElementById('splash-screen').style.opacity = '0';
                 setTimeout(() => document.getElementById('splash-screen').style.display = 'none', 800);
-                // Show Popup
-                setTimeout(() => document.getElementById('wa-popup').classList.add('show'), 6000);
             }, 2000);
             renderHome();
+            setTimeout(() => document.getElementById('wa-popup').classList.add('show'), 8000);
         });
 
         function closePopup() { document.getElementById('wa-popup').classList.remove('show'); }
 
-        // Search Logic
         function triggerSearch() {
             const q = document.getElementById('search-input').value;
             if(q) renderGrid(q);
         }
 
-        document.getElementById('search-input').addEventListener('keypress', (e) => {
-            if(e.key === 'Enter') triggerSearch();
-        });
+        document.getElementById('search-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') triggerSearch(); });
 
-        // Data Fetching
-        async function searchVideos(query) {
+        async function fetchVideos(query) {
             for (let node of API_NODES) {
                 try {
                     const res = await fetch(`${node}/search?q=${encodeURIComponent(query)}&filter=videos`);
@@ -221,7 +202,8 @@
                         id: v.url.split('v=')[1] || v.videoId,
                         title: v.title,
                         thumb: `https://i.ytimg.com/vi/${v.url.split('v=')[1] || v.videoId}/mqdefault.jpg`,
-                        author: v.uploaderName
+                        author: v.uploaderName,
+                        time: v.uploadedDate || "Recently" // <--- Yahan Time fix kia
                     }));
                 } catch (e) { continue; }
             }
@@ -229,22 +211,24 @@
         }
 
         async function renderHome() {
-            renderGrid("new hollywood movies hindi dubbed 2024 full movie");
+            renderGrid("new hollywood movies hindi dubbed 2024");
         }
 
         async function renderGrid(query) {
             const main = document.getElementById('main-view');
             main.innerHTML = '<div style="text-align:center; padding:100px;"><div class="splash-loader" style="margin:auto;"></div></div>';
-            
-            const videos = await searchVideos(query);
-            let html = `<h2 style="margin-bottom:20px; font-weight:800; letter-spacing:-1px;">Trending in "${query}"</h2><div class="video-grid">`;
+            const videos = await fetchVideos(query);
+            let html = `<h2 style="margin-bottom:20px; letter-spacing:-1px;">Results for "${query}"</h2><div class="video-grid">`;
             videos.forEach(v => {
                 html += `
-                    <div class="king-card" onclick="playKingVideo('${v.id}', '${v.title.replace(/'/g, "")}', '${v.author}')">
+                    <div class="king-card" onclick="playKingVideo('${v.id}', '${v.title.replace(/'/g, "")}', '${v.author}', '${v.time}')">
                         <div class="king-thumb"><img src="${v.thumb}" loading="lazy"></div>
                         <div class="king-info">
                             <div class="king-title">${v.title}</div>
-                            <div class="king-meta"><i class="fas fa-check-circle" style="color:var(--gold)"></i> ${v.author}</div>
+                            <div class="king-meta">
+                                <span>${v.author}</span>
+                                <span class="time-tag">${v.time}</span>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -253,7 +237,7 @@
             main.innerHTML = html;
         }
 
-        async function playKingVideo(id, title, author) {
+        async function playKingVideo(id, title, author, time) {
             const main = document.getElementById('main-view');
             const side = document.getElementById('side-view');
             window.scrollTo({top: 0, behavior: 'smooth'});
@@ -262,26 +246,27 @@
                 <div class="player-box">
                     <iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" allow="autoplay; fullscreen" allowfullscreen></iframe>
                 </div>
-                <h1 style="margin: 20px 0 10px 0; font-size: 1.4rem; line-height:1.2;">${title}</h1>
-                <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:20px; border-bottom:1px solid #222;">
-                    <div style="font-weight:bold; color:var(--gold);"><i class="fas fa-user-circle"></i> ${author}</div>
-                    <div style="display:flex; gap:15px;">
-                        <span style="cursor:pointer; background:#222; padding:8px 15px; border-radius:5px; font-size:14px;"><i class="fas fa-thumbs-up"></i> Like</span>
-                        <span onclick="window.open('https://wa.me/?text=Watch this: ${title} - https://www.youtube.com/watch?v=${id}')" style="cursor:pointer; background:#222; padding:8px 15px; border-radius:5px; font-size:14px;"><i class="fas fa-share"></i> Share</span>
-                    </div>
+                <h1 style="font-size:1.3rem; margin-bottom:10px;">${title}</h1>
+                <div style="display:flex; align-items:center; gap:15px; padding-bottom:20px; border-bottom:1px solid #222;">
+                    <div style="color:var(--gold); font-weight:bold;">${author}</div>
+                    <div style="color:#888; font-size:13px;">Uploaded: ${time}</div>
+                </div>
+                <div style="margin-top:15px; display:flex; gap:10px;">
+                    <button onclick="window.open('https://wa.me/923012709322')" style="padding:8px 15px; border-radius:5px; border:none; background:#222; color:#fff; cursor:pointer;"><i class="fas fa-flag"></i> Report</button>
+                    <button onclick="window.open('https://chat.whatsapp.com/EZhxFOubSr4IWqANqsi2AL')" style="padding:8px 15px; border-radius:5px; border:none; background:var(--primary); color:#fff; cursor:pointer;"><i class="fab fa-whatsapp"></i> Join Group</button>
                 </div>
             `;
 
             // Sidebar Suggestions
-            const related = await searchVideos(author);
-            let sHtml = `<h3 style="margin-bottom:15px; font-weight:800;">Related for You</h3>`;
-            related.slice(0, 12).forEach(v => {
+            const related = await fetchVideos(author);
+            let sHtml = `<h3 style="margin-bottom:15px;">Up Next</h3>`;
+            related.slice(0, 10).forEach(v => {
                 sHtml += `
-                    <div class="king-card" style="display:flex; margin-bottom:12px; gap:12px; background:none; border:none;" onclick="playKingVideo('${v.id}', '${v.title.replace(/'/g, "")}', '${v.author}')">
-                        <div class="king-thumb" style="width:140px; height:80px; flex-shrink:0; border-radius:8px;"><img src="${v.thumb}"></div>
-                        <div style="padding-top:5px;">
-                            <div class="king-title" style="font-size:12px; height:32px; margin-bottom:4px;">${v.title}</div>
-                            <div class="king-meta" style="font-size:10px;">${v.author}</div>
+                    <div class="king-card" style="display:flex; margin-bottom:12px; gap:10px;" onclick="playKingVideo('${v.id}', '${v.title.replace(/'/g, "")}', '${v.author}', '${v.time}')">
+                        <div class="king-thumb" style="width:140px; height:80px; flex-shrink:0;"><img src="${v.thumb}"></div>
+                        <div style="padding:2px;">
+                            <div class="king-title" style="font-size:12px; height:32px;">${v.title}</div>
+                            <div class="king-meta" style="font-size:10px;">${v.author} • ${v.time}</div>
                         </div>
                     </div>
                 `;
